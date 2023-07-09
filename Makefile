@@ -4,6 +4,9 @@ TARGET_NAME := rpi_3d_renderer.elf
 SSH_HOST := root@home-server.local
 SSH_TARGET_DIR := /root/pico/dev/rpi-3d-renderer
 
+#build:
+#	mkdir -p build && cd build && cmake .. && make
+
 run:
 	mkdir -p build && cd build && cmake .. && make && \
 	scp -i ~/.ssh/id_rsa $(TARGET_NAME) $(SSH_HOST):$(SSH_TARGET_DIR) && \
