@@ -19,22 +19,6 @@ static uint32_t sdl_color_to_uint32(SDL_Color color) {
     return num;
 }
 
-static void move_points(std::vector<point3> &points, vec3 &diff) {
-    for (auto &point : points) {
-        point.x += diff.x;
-        point.y += diff.y;
-        point.z += diff.z;
-    }
-}
-
-static void scale_points(std::vector<point3> &points, float factor) {
-    for (auto &point : points) {
-        point.x *= factor;
-        point.y *= factor;
-        point.z *= factor;
-    }
-}
-
 //static void draw(uint32_t *pixels) {
 //    for (auto &point : cube) {
 //        pixels[((int)(point.z) * SCREEN_WIDTH + (int)(point.x))] = 0xffffffff;

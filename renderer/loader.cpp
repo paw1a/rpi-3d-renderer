@@ -1,7 +1,7 @@
 #include "loader.h"
 #include <vector>
 #include <string>
-#include <fstream>
+#include <iostream>
 
 static std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
     size_t pos_start = 0;
@@ -36,6 +36,9 @@ bool load_objects(std::ifstream &ifs, std::map<std::string, object> &objects) {
             if (!object_name.empty())
                 objects[object_name] = object;
 
+            object.faces.clear();
+            object.vertices.clear();
+            object.normals.clear();
             object_name = tokens[1];
         }
 
