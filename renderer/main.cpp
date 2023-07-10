@@ -6,9 +6,7 @@
 #include "common.h"
 #include "loader.h"
 #include "debug.h"
-
-#define SCREEN_WIDTH 1080
-#define SCREEN_HEIGHT 720
+#include "pipeline.h"
 
 static uint32_t sdl_color_to_uint32(SDL_Color color) {
     uint32_t num = color.r;
@@ -27,16 +25,27 @@ static uint32_t sdl_color_to_uint32(SDL_Color color) {
 
 int main() {
     std::map<std::string, object> objects;
-    std::ifstream file("../cubes.obj", std::ios::in);
+    std::ifstream file("../cube.obj", std::ios::in);
     if (!load_objects(file, objects)) {
         printf("failed to load objects\n");
         return -1;
     }
 
-    for (auto &pair : objects) {
-        std::cout << pair.first << std::endl;
-        std::cout << pair.second << std::endl;
+    adjust_data_to_display(objects);
+
+    for (auto const &[name, object] : objects) {
+        std::cout << name << std::endl;
+        std::cout << object << std::endl;
     }
+
+    std::vector<polygon> polygons;
+    if (!preprocess_objects(objects, polygons)) {
+        printf("failed to preprocess objects\n");
+        return -1;
+    }
+
+    for (auto &polygon : polygons)
+        std::cout << polygon << std::endl;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("failed to init sdl: %s\n", SDL_GetError());
@@ -84,6 +93,11 @@ int main() {
                         break;
                 }
             }
+        }
+
+        for (auto const &[name, object] : objects) {
+            for (auto &vertex : object.vertices)
+                pixels[(int)(vertex.y) * SCREEN_WIDTH + (int)vertex.x] = 0xffffffff;
         }
 
 //        draw(pixels);

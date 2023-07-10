@@ -2,10 +2,7 @@
 #include "common.h"
 #include <map>
 #include <cmath>
-
-int preprocess_objects(const std::map<std::string, object> &objects, std::vector<polygon> &polygons) {
-
-}
+#include <string>
 
 static void move_points(std::vector<point3> &points, const vec3 &diff) {
     for (auto &point : points) {
@@ -79,26 +76,91 @@ static bool solve_slae(std::vector<float> &res_column,
     return true;
 }
 
-surface_equation_t get_surface_eq(const std::vector<vertex> &vertices)
-{
-    surface_equation_t eq = {0., 0., 0.};
-
-    for (size_t i = 0; i < points.size(); ++i)
-        for (size_t j = i + 1; j < points.size(); ++j)
-            for (size_t k = j + 1; k < points.size(); ++k)
-            {
-                vector<float> res(3, 0.);
-                vector<vector<float>> matrix = \
-                    {
-                        {points[i].x, points[i].y, points[i].z},
-                        {points[j].x, points[j].y, points[j].z},
-                        {points[k].x, points[k].y, points[k].z}
+static void compute_plane_equation(const std::vector<vertex> &vertices, polygon &polygon) {
+    polygon.a = polygon.b = polygon.c = 0;
+    polygon.d = 1000;
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        for (size_t j = i + 1; j < vertices.size(); ++j) {
+            for (size_t k = j + 1; k < vertices.size(); ++k) {
+                std::vector<float> res(3, 0.);
+                std::vector<std::vector<float>> matrix = {
+                    {vertices[i].x, vertices[i].y, vertices[i].z},
+                    {vertices[j].x, vertices[j].y, vertices[j].z},
+                    {vertices[k].x, vertices[k].y, vertices[k].z}
                 };
-                vector<float> free_coefs(3, -surface_equation_t::d);
+                std::vector<float> free_factor_column(3, -polygon.d);
 
-                if (solve_slae(res, matrix, free_coefs) == EXIT_SUCCESS)
-                    return {res[0], res[1], res[2]};
+                if (solve_slae(res, matrix, free_factor_column)) {
+                    polygon.a = res[0];
+                    polygon.b = res[1];
+                    polygon.c = res[2];
+                }
+            }
+        }
+    }
+}
+
+static uint32_t convert_color(color color) {
+    uint32_t num = (int)(color.x * 256);
+    num |= ((int)(color.y * 256) << 8);
+    num |= ((int)(color.z * 256) << 16);
+
+    return num;
+}
+
+void adjust_data_to_display(std::map<std::string, object> &objects) {
+    float xmin = 0., xmax = 0., ymin = 0., ymax = 0.;
+
+    for (auto const &[name, object] : objects) {
+        for (auto &vertex : object.vertices) {
+            if (vertex.x < xmin)
+                xmin = vertex.x;
+
+            if (vertex.x > xmax)
+                xmax = vertex.x;
+
+            if (vertex.y < ymin)
+                ymin = vertex.y;
+
+            if (vertex.y > ymax)
+                ymax = vertex.y;
+        }
+    }
+
+    vec3 diff = {-xmin, -ymin, 0.};
+    for (auto &[name, object] : objects)
+        move_points(object.vertices, diff);
+
+    xmax -= xmin;
+    ymax -= ymin;
+
+    size_t display_width = SCREEN_WIDTH, display_height = SCREEN_HEIGHT;
+
+    float scale_coef_x = display_width / xmax;
+    float scale_coef_y = display_height / ymax;
+    for (auto &[name, object] : objects)
+        scale_points(object.vertices, std::min(scale_coef_x, scale_coef_y));
+}
+
+bool preprocess_objects(const std::map<std::string, object> &objects, std::vector<polygon> &polygons) {
+    for (auto const &[name, object] : objects) {
+        for (auto &face : object.faces) {
+            std::vector<vertex> vertices;
+            for (auto &index : face.vertex_indices)
+                vertices.push_back(object.vertices[index]);
+
+            polygon polygon;
+            for (auto &vertex_index : face.vertex_indices) {
+                auto x = (uint16_t)vertices[vertex_index].x;
+                auto y = (uint16_t)vertices[vertex_index].y;
+                polygon.vertices.push_back({x, y});
             }
 
-    return eq;
+            polygon.color = convert_color(face.color);
+            compute_plane_equation(vertices, polygon);
+            polygons.push_back(polygon);
+        }
+    }
+
+    return true;
 }

@@ -2,6 +2,9 @@
 
 #include <vector>
 
+#define SCREEN_WIDTH 1080
+#define SCREEN_HEIGHT 720
+
 struct point3 {
     float x;
     float y;
@@ -31,6 +34,12 @@ struct object {
 
 struct polygon {
     std::vector<point2> vertices;
-    uint16_t color;
+    uint32_t color;
     float a, b, c, d;
+};
+
+struct window {
+    point2 begin;
+    point2 end;
+    std::vector<polygon> polygons;
 };

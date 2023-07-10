@@ -4,4 +4,6 @@
 #include <map>
 #include <vector>
 
-int preprocess_objects(const std::map<std::string, object> &objects, std::vector<polygon> &polygons);
+bool preprocess_objects(const std::map<std::string,
+                        object> &objects, std::vector<polygon> &polygons);
+void adjust_data_to_display(std::map<std::string, object> &objects);

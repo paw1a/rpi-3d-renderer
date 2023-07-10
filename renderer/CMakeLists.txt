@@ -12,6 +12,7 @@ add_executable(renderer
         loader.cpp
         debug.cpp
         pipeline.cpp
+        render.cpp
         )
 
 target_link_libraries(renderer PRIVATE SDL2::SDL2 SDL2_image::SDL2_image)
