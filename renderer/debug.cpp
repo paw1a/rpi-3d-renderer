@@ -1,11 +1,11 @@
 #include "debug.h"
 
 std::ostream &operator<<(std::ostream &os, const point3 &point) {
-    return os  << '(' << point.x << "; " << point.y << "; " << point.z << ')';
+    return os << '(' << point.x << "; " << point.y << "; " << point.z << ')';
 }
 
 std::ostream &operator<<(std::ostream &os, const point2 &point) {
-    return os  << '(' << point.x << "; " << point.y << ')';
+    return os << '(' << point.x << "; " << point.y << ')';
 }
 
 std::ostream &operator<<(std::ostream &os, const face &face) {
@@ -43,7 +43,7 @@ std::ostream &operator<<(std::ostream &os, const polygon &polygon) {
     os << std::endl;
 
     os << "polygon plane factors: " << polygon.a << ", " << polygon.b << ", "
-    << polygon.c << ", " << polygon.d << std::endl;
+       << polygon.c << ", " << polygon.d << std::endl;
     os << "polygon color hex: " << std::hex << polygon.color << std::dec;
 
     return os;

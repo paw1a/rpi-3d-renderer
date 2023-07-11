@@ -1,7 +1,7 @@
 #include "pipeline.h"
 #include "common.h"
-#include <map>
 #include <cmath>
+#include <map>
 #include <string>
 
 static void move_points(std::vector<point3> &points, const vec3 &diff) {
@@ -62,7 +62,8 @@ static bool solve_slae(std::vector<float> &res_column,
         }
     }
 
-    if (abs(matrix[rows_count - 1][columns_count - 1]) <= std::numeric_limits<float>::epsilon())
+    if (abs(matrix[rows_count - 1][columns_count - 1]) <=
+        std::numeric_limits<float>::epsilon())
         return false;
 
     for (int i = rows_count - 1; i >= 0; i--) {
@@ -76,7 +77,8 @@ static bool solve_slae(std::vector<float> &res_column,
     return true;
 }
 
-static void compute_plane_equation(const std::vector<vertex> &vertices, polygon &polygon) {
+static void compute_plane_equation(const std::vector<vertex> &vertices,
+                                   polygon &polygon) {
     polygon.a = polygon.b = polygon.c = 0;
     polygon.d = 1000;
     for (size_t i = 0; i < vertices.size(); ++i) {
@@ -86,8 +88,7 @@ static void compute_plane_equation(const std::vector<vertex> &vertices, polygon 
                 std::vector<std::vector<float>> matrix = {
                     {vertices[i].x, vertices[i].y, vertices[i].z},
                     {vertices[j].x, vertices[j].y, vertices[j].z},
-                    {vertices[k].x, vertices[k].y, vertices[k].z}
-                };
+                    {vertices[k].x, vertices[k].y, vertices[k].z}};
                 std::vector<float> free_factor_column(3, -polygon.d);
 
                 if (solve_slae(res, matrix, free_factor_column)) {
@@ -142,7 +143,8 @@ void adjust_data_to_display(std::map<std::string, object> &objects) {
         scale_points(object.vertices, std::min(scale_coef_x, scale_coef_y));
 }
 
-bool preprocess_objects(const std::map<std::string, object> &objects, std::vector<polygon> &polygons) {
+bool preprocess_objects(const std::map<std::string, object> &objects,
+                        std::vector<polygon> &polygons) {
     for (auto const &[name, object] : objects) {
         for (auto &face : object.faces) {
             std::vector<vertex> vertices;

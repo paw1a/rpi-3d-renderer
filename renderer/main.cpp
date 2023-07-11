@@ -1,11 +1,11 @@
 #include <SDL.h>
-#include <vector>
-#include <map>
 #include <fstream>
+#include <map>
+#include <vector>
 
 #include "common.h"
-#include "loader.h"
 #include "debug.h"
+#include "loader.h"
 #include "pipeline.h"
 
 static uint32_t sdl_color_to_uint32(SDL_Color color) {
@@ -17,11 +17,12 @@ static uint32_t sdl_color_to_uint32(SDL_Color color) {
     return num;
 }
 
-//static void draw(uint32_t *pixels) {
-//    for (auto &point : cube) {
-//        pixels[((int)(point.z) * SCREEN_WIDTH + (int)(point.x))] = 0xffffffff;
-//    }
-//}
+// static void draw(uint32_t *pixels) {
+//     for (auto &point : cube) {
+//         pixels[((int)(point.z) * SCREEN_WIDTH + (int)(point.x))] =
+//         0xffffffff;
+//     }
+// }
 
 int main() {
     std::map<std::string, object> objects;
@@ -52,21 +53,24 @@ int main() {
         return -1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("Test Renderer", SDL_WINDOWPOS_CENTERED,
-                                          SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow(
+        "Test Renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
         printf("failed to create window: %s\n", SDL_GetError());
         return -1;
     }
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer *renderer = SDL_CreateRenderer(
+        window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == nullptr) {
         printf("failed to create renderer: %s\n", SDL_GetError());
         return -1;
     }
 
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888,
-                                             SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+                                             SDL_TEXTUREACCESS_STREAMING,
+                                             SCREEN_WIDTH, SCREEN_HEIGHT);
     if (texture == nullptr) {
         printf("failed to create texture: %s\n", SDL_GetError());
         return -1;
@@ -86,21 +90,22 @@ int main() {
                 quit = true;
             } else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
-                    case SDLK_ESCAPE:
-                        quit = true;
-                        break;
-                    case SDLK_UP:
-                        break;
+                case SDLK_ESCAPE:
+                    quit = true;
+                    break;
+                case SDLK_UP:
+                    break;
                 }
             }
         }
 
         for (auto const &[name, object] : objects) {
             for (auto &vertex : object.vertices)
-                pixels[(int)(vertex.y) * SCREEN_WIDTH + (int)vertex.x] = 0xffffffff;
+                pixels[(int)(vertex.y) * SCREEN_WIDTH + (int)vertex.x] =
+                    0xffffffff;
         }
 
-//        draw(pixels);
+        //        draw(pixels);
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
@@ -108,7 +113,7 @@ int main() {
         SDL_RenderPresent(renderer);
     }
 
-    delete [] pixels;
+    delete[] pixels;
     SDL_DestroyWindow(window);
     SDL_Quit();
 

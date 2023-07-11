@@ -20,6 +20,11 @@ struct point2 {
     uint32_t y;
 };
 
+struct line2 {
+    point2 begin;
+    point2 end;
+};
+
 struct face {
     std::vector<size_t> vertex_indices;
     size_t normal_index;
@@ -39,7 +44,9 @@ struct polygon {
 };
 
 struct window {
+    // top left corner
     point2 begin;
+    // bottom right corner
     point2 end;
     std::vector<polygon> polygons;
 };

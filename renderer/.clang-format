@@ -1,0 +1,12 @@
+BasedOnStyle: llvm
+ColumnLimit: 80
+IndentWidth: 4
+AllowShortIfStatementsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AllowShortLoopsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
+AlwaysBreakTemplateDeclarations: Yes
+PointerAlignment: Right
