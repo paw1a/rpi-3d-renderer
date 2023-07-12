@@ -48,3 +48,13 @@ std::ostream &operator<<(std::ostream &os, const polygon &polygon) {
 
     return os;
 }
+
+std::ostream &operator<<(std::ostream &os, const window &window) {
+    os << "window: ";
+    os << window.begin << ", " << window.end << std::endl;
+    os << "window polygons:" << std::endl;
+    //    for (auto &polygon : window.polygons)
+    //        os << polygon << std::endl;
+
+    return os;
+}

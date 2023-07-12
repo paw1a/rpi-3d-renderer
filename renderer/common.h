@@ -16,8 +16,8 @@ using color = point3;
 using vertex = point3;
 
 struct point2 {
-    uint32_t x;
-    uint32_t y;
+    uint16_t x;
+    uint16_t y;
 };
 
 struct line2 {
@@ -41,6 +41,17 @@ struct polygon {
     std::vector<point2> vertices;
     uint32_t color;
     float a, b, c, d;
+};
+
+struct polygons {
+    size_t count;
+    polygon *array;
+};
+
+template <typename T>
+struct array {
+    T *data;
+    size_t size;
 };
 
 struct window {

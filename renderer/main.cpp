@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "loader.h"
 #include "pipeline.h"
+#include "render.h"
 
 static uint32_t sdl_color_to_uint32(SDL_Color color) {
     uint32_t num = color.r;
@@ -17,16 +18,9 @@ static uint32_t sdl_color_to_uint32(SDL_Color color) {
     return num;
 }
 
-// static void draw(uint32_t *pixels) {
-//     for (auto &point : cube) {
-//         pixels[((int)(point.z) * SCREEN_WIDTH + (int)(point.x))] =
-//         0xffffffff;
-//     }
-// }
-
 int main() {
     std::map<std::string, object> objects;
-    std::ifstream file("../cube.obj", std::ios::in);
+    std::ifstream file("../monkey.obj", std::ios::in);
     if (!load_objects(file, objects)) {
         printf("failed to load objects\n");
         return -1;
@@ -47,6 +41,13 @@ int main() {
 
     for (auto &polygon : polygons)
         std::cout << polygon << std::endl;
+
+    auto *render_buffer = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
+    memset(render_buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
+    init_render(render_buffer);
+
+    window win = {{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons};
+    warnock_render(win, 0x0);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("failed to init sdl: %s\n", SDL_GetError());
@@ -76,7 +77,7 @@ int main() {
         return -1;
     }
 
-    auto *pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_HEIGHT];
+    auto *pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
 
     bool quit = false;
     while (!quit) {
@@ -99,13 +100,8 @@ int main() {
             }
         }
 
-        for (auto const &[name, object] : objects) {
-            for (auto &vertex : object.vertices)
-                pixels[(int)(vertex.y) * SCREEN_WIDTH + (int)vertex.x] =
-                    0xffffffff;
-        }
-
-        //        draw(pixels);
+        memcpy(pixels, render_buffer,
+               SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint32_t));
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);

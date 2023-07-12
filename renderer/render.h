@@ -1,5 +1,6 @@
-#pragma once
+ #pragma once
 
-#include "common.h"
+ #include "common.h"
 
-void warnock_render(const window &window, const uint32_t bg_color);
+ void init_render(uint32_t *pixels);
+ void warnock_render(const window &window, uint16_t bg_color);

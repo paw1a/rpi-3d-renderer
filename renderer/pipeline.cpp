@@ -105,6 +105,7 @@ static uint32_t convert_color(color color) {
     uint32_t num = (int)(color.x * 256);
     num |= ((int)(color.y * 256) << 8);
     num |= ((int)(color.z * 256) << 16);
+    num |= (0xff << 24);
 
     return num;
 }
@@ -139,8 +140,9 @@ void adjust_data_to_display(std::map<std::string, object> &objects) {
 
     float scale_coef_x = display_width / xmax;
     float scale_coef_y = display_height / ymax;
-    for (auto &[name, object] : objects)
+    for (auto &[name, object] : objects) {
         scale_points(object.vertices, std::min(scale_coef_x, scale_coef_y));
+    }
 }
 
 bool preprocess_objects(const std::map<std::string, object> &objects,
@@ -152,9 +154,9 @@ bool preprocess_objects(const std::map<std::string, object> &objects,
                 vertices.push_back(object.vertices[index]);
 
             polygon polygon;
-            for (auto &vertex_index : face.vertex_indices) {
-                auto x = (uint16_t)vertices[vertex_index].x;
-                auto y = (uint16_t)vertices[vertex_index].y;
+            for (auto &vertex : vertices) {
+                auto x = static_cast<uint16_t>(vertex.x);
+                auto y = static_cast<uint16_t>(vertex.y);
                 polygon.vertices.push_back({x, y});
             }
 
