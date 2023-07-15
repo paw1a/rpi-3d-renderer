@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include "color.h"
+#include <vector>
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720

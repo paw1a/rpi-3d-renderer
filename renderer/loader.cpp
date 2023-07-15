@@ -22,7 +22,8 @@ static std::vector<std::string> split(const std::string &s,
     return res;
 }
 
-bool load_objects(std::ifstream &ifs, const std::map<std::string, material> &materials,
+bool load_objects(std::ifstream &ifs,
+                  const std::map<std::string, material> &materials,
                   std::map<std::string, object> &objects) {
     object object = {};
     material material = {};
@@ -78,7 +79,8 @@ bool load_objects(std::ifstream &ifs, const std::map<std::string, material> &mat
         if (tokens.size() == 2 && tokens[0] == "usemtl") {
             auto it = materials.find(tokens[1]);
             if (it == materials.end()) {
-                std::cout << "material with name " << tokens[1] << " not found" << std::endl;
+                std::cout << "material with name " << tokens[1] << " not found"
+                          << std::endl;
                 return false;
             }
 
@@ -92,7 +94,8 @@ bool load_objects(std::ifstream &ifs, const std::map<std::string, material> &mat
     return true;
 }
 
-bool load_materials(std::ifstream &ifs, std::map<std::string, material> &materials) {
+bool load_materials(std::ifstream &ifs,
+                    std::map<std::string, material> &materials) {
     material material = {};
     std::string material_name;
     float ns = 0;
@@ -108,8 +111,8 @@ bool load_materials(std::ifstream &ifs, std::map<std::string, material> &materia
         if (tokens.size() == 2 && tokens[0] == "newmtl") {
             if (!material_name.empty())
                 materials[material_name] = {{material.color.r * ns,
-                                            material.color.g * ns,
-                                            material.color.b * ns}};
+                                             material.color.g * ns,
+                                             material.color.b * ns}};
 
             material_name = tokens[1];
         }
@@ -118,13 +121,14 @@ bool load_materials(std::ifstream &ifs, std::map<std::string, material> &materia
             ns = stof(tokens[1]);
 
         if (tokens.size() == 4 && tokens[0] == "Kd")
-            material.color = {stof(tokens[1]), stof(tokens[2]), stof(tokens[3])};
+            material.color = {stof(tokens[1]), stof(tokens[2]),
+                              stof(tokens[3])};
     }
 
     if (!material_name.empty())
         materials[material_name] = {{material.color.r * ns,
-                                    material.color.g * ns,
-                                    material.color.b * ns}};
+                                     material.color.g * ns,
+                                     material.color.b * ns}};
 
     return true;
 }

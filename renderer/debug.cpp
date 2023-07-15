@@ -9,11 +9,13 @@ std::ostream &operator<<(std::ostream &os, const point2 &point) {
 }
 
 std::ostream &operator<<(std::ostream &os, const color &color) {
-    return os << '(' << (int)color.r << "; " << (int)color.g << "; " << (int)color.b << ')';
+    return os << '(' << (int)color.r << "; " << (int)color.g << "; "
+              << (int)color.b << ')';
 }
 
 std::ostream &operator<<(std::ostream &os, const material &material) {
-    return os << '(' << (int)material.color.r << "; " << (int)material.color.g << "; " << (int)material.color.b << ')';
+    return os << '(' << (int)material.color.r << "; " << (int)material.color.g
+              << "; " << (int)material.color.b << ')';
 }
 
 std::ostream &operator<<(std::ostream &os, const face &face) {

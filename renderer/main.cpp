@@ -104,7 +104,8 @@ int main() {
             }
         }
 
-        warnock_render({{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons}, BLACK, set_pixel);
+        warnock_render({{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons}, BLACK,
+                       set_pixel);
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);

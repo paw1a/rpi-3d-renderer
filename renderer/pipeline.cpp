@@ -102,7 +102,6 @@ static void compute_plane_equation(const std::vector<vertex> &vertices,
 }
 
 static uint16_t material_to_rgb565(material material) {
-
 }
 
 bool preprocess_objects(const std::map<std::string, object> &objects,

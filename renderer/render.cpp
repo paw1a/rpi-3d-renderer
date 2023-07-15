@@ -41,7 +41,8 @@ static bool is_inside_polygon(const point2 &point, const polygon &polygon) {
     return fabsf(sum) > 1e-5f;
 }
 
-static inline bool on_segment(const point2 &p, const point2 &q, const point2 &r) {
+static inline bool on_segment(const point2 &p, const point2 &q,
+                              const point2 &r) {
     return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
            q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
 }
@@ -82,10 +83,12 @@ static bool check_lines_intersection(const line2 &line1, const line2 &line2) {
     return false;
 }
 
-static relationship check_relationship(const polygon &polygon, const window &window) {
+static relationship check_relationship(const polygon &polygon,
+                                       const window &window) {
     uint16_t x_min = window.begin.x, x_max = window.end.x - 1;
     uint16_t y_min = window.begin.y, y_max = window.end.y - 1;
-    point2 windows_vertices[4] = {{x_min, y_min}, {x_min, y_max}, {x_max, y_max}, {x_max, y_min}};
+    point2 windows_vertices[4] = {
+        {x_min, y_min}, {x_min, y_max}, {x_max, y_max}, {x_max, y_min}};
 
     for (int i = 0; i < polygon.vertices.size(); ++i) {
         for (int j = 0; j < 4; ++j) {
@@ -98,13 +101,13 @@ static relationship check_relationship(const polygon &polygon, const window &win
         }
     }
 
-
     if (polygon.vertices[0].x >= x_min && polygon.vertices[0].x <= x_max &&
         polygon.vertices[0].y >= y_min && polygon.vertices[0].y <= y_max)
         return relationship::contained;
 
-    return is_inside_polygon(windows_vertices[0], polygon) ? relationship::surrounding
-                                                  : relationship::disjoint;
+    return is_inside_polygon(windows_vertices[0], polygon)
+               ? relationship::surrounding
+               : relationship::disjoint;
 }
 
 static void fill_pixel(const point2 &point, std::vector<polygon> &polygons,
@@ -141,13 +144,13 @@ void split_window(std::stack<window> &stack, const window &window,
 
     if (window_width > 1 && window_height > 1) {
         stack.push(
-                {{window.begin.x, window.begin.y}, {x_split, y_split}, polygons});
+            {{window.begin.x, window.begin.y}, {x_split, y_split}, polygons});
         stack.push(
-                {{x_split, window.begin.y}, {window.end.x, y_split}, polygons});
+            {{x_split, window.begin.y}, {window.end.x, y_split}, polygons});
         stack.push(
-                {{window.begin.x, y_split}, {x_split, window.end.y}, polygons});
+            {{window.begin.x, y_split}, {x_split, window.end.y}, polygons});
         stack.push(
-                {{x_split, y_split}, {window.end.x, window.end.y}, polygons});
+            {{x_split, y_split}, {window.end.x, window.end.y}, polygons});
     } else if (window_width > 1) {
         stack.push({{window.begin.x, window.begin.y},
                     {x_split, window.end.y},
@@ -165,15 +168,15 @@ void split_window(std::stack<window> &stack, const window &window,
     }
 }
 
-std::pair<bool, polygon> find_cover_polygon(const window &window, std::vector<polygon> &polygons) {
+std::pair<bool, polygon> find_cover_polygon(const window &window,
+                                            std::vector<polygon> &polygons) {
     auto window_end_x = static_cast<uint16_t>(window.end.x - 1);
     auto window_end_y = static_cast<uint16_t>(window.end.y - 1);
 
-    point2 window_vertices[4] = {
-            {window.begin.x, window.begin.y},
-            {window.begin.x, window_end_y},
-            {window_end_x, window_end_y},
-            {window_end_x, window.begin.y}};
+    point2 window_vertices[4] = {{window.begin.x, window.begin.y},
+                                 {window.begin.x, window_end_y},
+                                 {window_end_x, window_end_y},
+                                 {window_end_x, window.begin.y}};
 
     size_t polygon_indices[4] = {0};
     float z_max[4];
@@ -241,7 +244,8 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
                 continue;
             }
 
-            std::pair<bool, polygon> result = find_cover_polygon(current_window, visible);
+            std::pair<bool, polygon> result =
+                find_cover_polygon(current_window, visible);
             if (result.first) {
                 fill_window(current_window, result.second.color, set_pixel);
             } else {

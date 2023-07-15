@@ -23,19 +23,15 @@ static inline uint16_t rgb_to_rgb565(const color &color) {
 }
 
 static inline color rgb565_to_rgb(const uint16_t hex) {
-    return {
-        static_cast<uint8_t>((hex >> 11) << 3),
-        static_cast<uint8_t>(((hex << 5) >> 10) << 2),
-        static_cast<uint8_t>(((hex << 11) >> 11) << 3)
-    };
+    return {static_cast<uint8_t>((hex >> 11) << 3),
+            static_cast<uint8_t>(((hex << 5) >> 10) << 2),
+            static_cast<uint8_t>(((hex << 11) >> 11) << 3)};
 }
 
 static inline color mtl_to_rgb(const material_color color) {
-    return {
-        static_cast<uint8_t>(color.r * 255),
-        static_cast<uint8_t>(color.g * 255),
-        static_cast<uint8_t>(color.b * 255)
-    };
+    return {static_cast<uint8_t>(color.r * 255),
+            static_cast<uint8_t>(color.g * 255),
+            static_cast<uint8_t>(color.b * 255)};
 }
 
 static inline uint16_t mtl_to_rgb565(const material_color color) {
@@ -70,7 +66,7 @@ static inline uint16_t mtl_to_rgb565(const material_color color) {
 #define DARKGRAY 0xAD55
 #define DARKGREEN2 0x0320
 #define DARKGREEN 0x03E0 /*   0, 128, 0 */
-#define DARKGREY 0x7BEF /* 128, 128, 128 */
+#define DARKGREY 0x7BEF  /* 128, 128, 128 */
 #define DARKKHAKI 0xBDAD
 #define DARKMAGENTA 0x8811
 #define DARKOLIVEGREEN 0x5345
@@ -97,7 +93,7 @@ static inline uint16_t mtl_to_rgb565(const material_color color) {
 #define GOLDENROD 0xDD24
 #define GRAY 0x8410
 #define GREEN2 0x0400
-#define GREEN 0x07E0 /*   0, 255, 0 */
+#define GREEN 0x07E0       /*   0, 255, 0 */
 #define GREENYELLOW 0xAFE5 /* 173, 255, 47 */
 #define HONEYDEW 0xF7FE
 #define HOTPINK 0xFB56
@@ -127,7 +123,7 @@ static inline uint16_t mtl_to_rgb565(const material_color color) {
 #define LIMEGREEN 0x3666
 #define LINEN 0xFF9C
 #define MAGENTA 0xF81F /* 255, 0, 255 */
-#define MAROON 0x7800 /* 128, 0, 0 */
+#define MAROON 0x7800  /* 128, 0, 0 */
 #define MAROON2 0x8000
 #define MEDIUMAQUAMARINE 0x6675
 #define MEDIUMBLUE 0x0019
