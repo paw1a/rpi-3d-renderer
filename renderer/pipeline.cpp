@@ -158,6 +158,7 @@ static uint16_t material_to_rgb565(const material &material, const std::vector<v
                  color.g / max_primary_color,
                  color.b / max_primary_color};
 
+//    return random_rgb565_color();
     return material_color_to_rgb565(color);
 }
 

@@ -28,6 +28,9 @@ bool load_objects(std::ifstream &ifs,
     object object = {};
     material material = {};
     std::string object_name;
+    std::pair<size_t, size_t> vertices_count;
+    std::pair<size_t, size_t> normals_count;
+
     for (std::string line; getline(ifs, line);) {
         size_t str_index;
         while ((str_index = line.find('\t')) != std::string::npos)
@@ -44,16 +47,20 @@ bool load_objects(std::ifstream &ifs,
             object.vertices.clear();
             object.normals.clear();
             object_name = tokens[1];
+            vertices_count.first = vertices_count.second;
+            normals_count.first = normals_count.second;
         }
 
         if (tokens.size() == 4 && tokens[0] == "v") {
             vertex vertex = {stof(tokens[1]), stof(tokens[2]), stof(tokens[3])};
             object.vertices.push_back(vertex);
+            ++vertices_count.second;
         }
 
         if (tokens.size() == 4 && tokens[0] == "vn") {
             vec3 normal = {stof(tokens[1]), stof(tokens[2]), stof(tokens[3])};
             object.normals.push_back(normal);
+            ++normals_count.second;
         }
 
         if (tokens.size() >= 4 && tokens[0] == "f") {
@@ -69,8 +76,8 @@ bool load_objects(std::ifstream &ifs,
                     return false;
                 }
 
-                face.vertex_indices.push_back(stoull(indices[0]) - 1);
-                face.normal_index = stoull(indices[2]) - 1;
+                face.vertex_indices.push_back(stoull(indices[0]) - 1 - vertices_count.first);
+                face.normal_index = stoull(indices[2]) - 1 - normals_count.first;
             }
 
             object.faces.push_back(face);

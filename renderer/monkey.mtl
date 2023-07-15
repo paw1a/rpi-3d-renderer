@@ -1,4 +1,4 @@
-# Blender 3.6.0 MTL File: 'untitled.blend'
+# Blender 3.6.0 MTL File: 'monkey.blend'
 # www.blender.org
 
 newmtl Material.001
@@ -14,7 +14,7 @@ illum 2
 newmtl Material.002
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
+Kd 0.800000 0.401157 0.053352
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000

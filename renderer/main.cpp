@@ -36,7 +36,7 @@ int main() {
 
     std::vector<vec3> lights = {
         {1, 1, 1},
-        {-1, 1, -1},
+        {-1, -1, -1},
     };
 
     std::map<std::string, object> objects;

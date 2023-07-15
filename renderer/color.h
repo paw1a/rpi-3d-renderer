@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <random>
 
 struct color {
     uint8_t r;
@@ -32,6 +33,10 @@ static inline color material_color_to_rgb(const material_color color) {
     return {static_cast<uint8_t>(color.r),
             static_cast<uint8_t>(color.g),
             static_cast<uint8_t>(color.b)};
+}
+
+static inline uint16_t random_rgb565_color() {
+    return rand() % 0xffff;
 }
 
 static inline uint16_t material_color_to_rgb565(const material_color color) {
