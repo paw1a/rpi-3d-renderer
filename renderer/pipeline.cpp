@@ -101,10 +101,67 @@ static void compute_plane_equation(const std::vector<vertex> &vertices,
     }
 }
 
-static uint16_t material_to_rgb565(material material) {
+void adjust_data_to_display(std::map<std::string, object> &objects) {
+    float xmin = 0., xmax = 0., ymin = 0., ymax = 0.;
+
+    for (auto const &[name, object] : objects) {
+        for (auto &vertex : object.vertices) {
+            if (vertex.x < xmin)
+                xmin = vertex.x;
+
+            if (vertex.x > xmax)
+                xmax = vertex.x;
+
+            if (vertex.y < ymin)
+                ymin = vertex.y;
+
+            if (vertex.y > ymax)
+                ymax = vertex.y;
+        }
+    }
+
+    vec3 diff = {-xmin, -ymin, 0.};
+    for (auto &[name, object] : objects)
+        move_points(object.vertices, diff);
+
+    xmax -= xmin;
+    ymax -= ymin;
+
+    size_t display_width = SCREEN_WIDTH, display_height = SCREEN_HEIGHT;
+
+    float scale_coef_x = display_width / xmax;
+    float scale_coef_y = display_height / ymax;
+    for (auto &[name, object] : objects) {
+        scale_points(object.vertices, std::min(scale_coef_x, scale_coef_y));
+    }
 }
 
-bool preprocess_objects(const std::map<std::string, object> &objects,
+static uint16_t material_to_rgb565(const material &material, const std::vector<vec3> &lights,
+                                   const vec3 &normal) {
+    float light_percent = 0.0;
+    for (auto &light : lights) {
+        float percent = cos_angle(light, normal);
+        if (percent > 0)
+            light_percent += percent;
+    }
+
+    if (light_percent <= 0.)
+        return material_color_to_rgb565({0.0, 0.0, 0.0});
+
+    material_color color = {material.color.r * light_percent,
+                            material.color.g * light_percent,
+                            material.color.b * light_percent};
+
+    float max_primary_color = std::fmax(color.r / 255, std::fmax(color.g / 255, color.b / 255));
+    if (max_primary_color > 1.0)
+        color = {color.r / max_primary_color,
+                 color.g / max_primary_color,
+                 color.b / max_primary_color};
+
+    return material_color_to_rgb565(color);
+}
+
+bool preprocess_objects(const std::map<std::string, object> &objects, const std::vector<vec3> &lights,
                         std::vector<polygon> &polygons) {
     for (auto const &[name, object] : objects) {
         for (auto &face : object.faces) {
@@ -119,7 +176,8 @@ bool preprocess_objects(const std::map<std::string, object> &objects,
                 polygon.vertices.push_back({x, y});
             }
 
-            polygon.color = material_to_rgb565(face.material);
+            polygon.color = material_to_rgb565(face.material, lights,
+                                               object.normals[face.normal_index]);
             compute_plane_equation(vertices, polygon);
             polygons.push_back(polygon);
         }

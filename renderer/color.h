@@ -19,7 +19,7 @@ struct material {
 };
 
 static inline uint16_t rgb_to_rgb565(const color &color) {
-    return ((color.r >> 3) << 11) | ((color.g >> 2) << 5) | (color.b >> 3);
+    return ((color.r & 0b11111000) << 8) | ((color.g & 0b11111100) << 3) | (color.b >> 3);
 }
 
 static inline color rgb565_to_rgb(const uint16_t hex) {
@@ -28,14 +28,14 @@ static inline color rgb565_to_rgb(const uint16_t hex) {
             static_cast<uint8_t>(((hex << 11) >> 11) << 3)};
 }
 
-static inline color mtl_to_rgb(const material_color color) {
-    return {static_cast<uint8_t>(color.r * 255),
-            static_cast<uint8_t>(color.g * 255),
-            static_cast<uint8_t>(color.b * 255)};
+static inline color material_color_to_rgb(const material_color color) {
+    return {static_cast<uint8_t>(color.r),
+            static_cast<uint8_t>(color.g),
+            static_cast<uint8_t>(color.b)};
 }
 
-static inline uint16_t mtl_to_rgb565(const material_color color) {
-    return rgb_to_rgb565(mtl_to_rgb(color));
+static inline uint16_t material_color_to_rgb565(const material_color color) {
+    return rgb_to_rgb565(material_color_to_rgb(color));
 }
 
 #define ALICEBLUE 0xF7DF

@@ -20,8 +20,10 @@ static uint32_t sdl_color_to_uint32(SDL_Color color) {
 
 static uint32_t *pixels;
 
-static void set_pixel(point2 point, uint16_t color) {
-    pixels[point.y * SCREEN_WIDTH + point.x] = color;
+static void set_pixel(point2 point, uint16_t rgb565_color) {
+    color rgb_color = rgb565_to_rgb(rgb565_color);
+    SDL_Color sdl_color = {rgb_color.r, rgb_color.g, rgb_color.b, 255};
+    pixels[point.y * SCREEN_WIDTH + point.x] = sdl_color_to_uint32(sdl_color);
 }
 
 int main() {
@@ -32,6 +34,11 @@ int main() {
         return -1;
     }
 
+    std::vector<vec3> lights = {
+        {1, 1, 1},
+        {-1, 1, -1},
+    };
+
     std::map<std::string, object> objects;
     std::ifstream object_file("../monkey.obj", std::ios::in);
     if (!load_objects(object_file, materials, objects)) {
@@ -39,13 +46,15 @@ int main() {
         return -1;
     }
 
+    adjust_data_to_display(objects);
+
     for (auto const &[name, object] : objects) {
         std::cout << name << std::endl;
         std::cout << object << std::endl;
     }
 
     std::vector<polygon> polygons;
-    if (!preprocess_objects(objects, polygons)) {
+    if (!preprocess_objects(objects, lights, polygons)) {
         printf("failed to preprocess objects\n");
         return -1;
     }
@@ -104,12 +113,10 @@ int main() {
             }
         }
 
-        warnock_render({{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons}, BLACK,
-                       set_pixel);
+        warnock_render({{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons}, BLACK, set_pixel);
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
-
         SDL_RenderPresent(renderer);
     }
 
