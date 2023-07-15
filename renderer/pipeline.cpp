@@ -101,48 +101,8 @@ static void compute_plane_equation(const std::vector<vertex> &vertices,
     }
 }
 
-static uint32_t convert_color(color color) {
-    uint32_t num = (int)(color.x * 256);
-    num |= ((int)(color.y * 256) << 8);
-    num |= ((int)(color.z * 256) << 16);
-    num |= (0xff << 24);
+static uint16_t material_to_rgb565(material material) {
 
-    return num;
-}
-
-void adjust_data_to_display(std::map<std::string, object> &objects) {
-    float xmin = 0., xmax = 0., ymin = 0., ymax = 0.;
-
-    for (auto const &[name, object] : objects) {
-        for (auto &vertex : object.vertices) {
-            if (vertex.x < xmin)
-                xmin = vertex.x;
-
-            if (vertex.x > xmax)
-                xmax = vertex.x;
-
-            if (vertex.y < ymin)
-                ymin = vertex.y;
-
-            if (vertex.y > ymax)
-                ymax = vertex.y;
-        }
-    }
-
-    vec3 diff = {-xmin, -ymin, 0.};
-    for (auto &[name, object] : objects)
-        move_points(object.vertices, diff);
-
-    xmax -= xmin;
-    ymax -= ymin;
-
-    size_t display_width = SCREEN_WIDTH, display_height = SCREEN_HEIGHT;
-
-    float scale_coef_x = display_width / xmax;
-    float scale_coef_y = display_height / ymax;
-    for (auto &[name, object] : objects) {
-        scale_points(object.vertices, std::min(scale_coef_x, scale_coef_y));
-    }
 }
 
 bool preprocess_objects(const std::map<std::string, object> &objects,
@@ -160,7 +120,7 @@ bool preprocess_objects(const std::map<std::string, object> &objects,
                 polygon.vertices.push_back({x, y});
             }
 
-            polygon.color = convert_color(face.color);
+            polygon.color = material_to_rgb565(face.material);
             compute_plane_equation(vertices, polygon);
             polygons.push_back(polygon);
         }

@@ -8,6 +8,14 @@ std::ostream &operator<<(std::ostream &os, const point2 &point) {
     return os << '(' << point.x << "; " << point.y << ')';
 }
 
+std::ostream &operator<<(std::ostream &os, const color &color) {
+    return os << '(' << (int)color.r << "; " << (int)color.g << "; " << (int)color.b << ')';
+}
+
+std::ostream &operator<<(std::ostream &os, const material &material) {
+    return os << '(' << (int)material.color.r << "; " << (int)material.color.g << "; " << (int)material.color.b << ')';
+}
+
 std::ostream &operator<<(std::ostream &os, const face &face) {
     os << "face vertex indices: ";
     for (auto &vertex_index : face.vertex_indices)
@@ -15,7 +23,7 @@ std::ostream &operator<<(std::ostream &os, const face &face) {
     os << std::endl;
 
     os << "face normal index: " << face.normal_index << std::endl;
-    os << "face color: " << face.color;
+    os << "face color: " << face.material;
 
     return os;
 }

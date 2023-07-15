@@ -18,15 +18,26 @@ static uint32_t sdl_color_to_uint32(SDL_Color color) {
     return num;
 }
 
+static uint32_t *pixels;
+
+static void set_pixel(point2 point, uint16_t color) {
+    pixels[point.y * SCREEN_WIDTH + point.x] = color;
+}
+
 int main() {
-    std::map<std::string, object> objects;
-    std::ifstream file("../monkey.obj", std::ios::in);
-    if (!load_objects(file, objects)) {
-        printf("failed to load objects\n");
+    std::map<std::string, material> materials;
+    std::ifstream material_file("../monkey.mtl", std::ios::in);
+    if (!load_materials(material_file, materials)) {
+        printf("failed to load materials\n");
         return -1;
     }
 
-    adjust_data_to_display(objects);
+    std::map<std::string, object> objects;
+    std::ifstream object_file("../monkey.obj", std::ios::in);
+    if (!load_objects(object_file, materials, objects)) {
+        printf("failed to load objects\n");
+        return -1;
+    }
 
     for (auto const &[name, object] : objects) {
         std::cout << name << std::endl;
@@ -41,13 +52,6 @@ int main() {
 
     for (auto &polygon : polygons)
         std::cout << polygon << std::endl;
-
-    auto *render_buffer = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
-    memset(render_buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
-    init_render(render_buffer);
-
-    window win = {{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons};
-    warnock_render(win, 0x0);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("failed to init sdl: %s\n", SDL_GetError());
@@ -77,7 +81,7 @@ int main() {
         return -1;
     }
 
-    auto *pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
+    pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
 
     bool quit = false;
     while (!quit) {
@@ -100,8 +104,7 @@ int main() {
             }
         }
 
-        memcpy(pixels, render_buffer,
-               SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint32_t));
+        warnock_render({{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons}, BLACK, set_pixel);
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);

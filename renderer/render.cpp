@@ -13,15 +13,6 @@ enum class relationship {
     surrounding
 };
 
-static uint32_t *buffer;
-void init_render(uint32_t *pixels) {
-    buffer = pixels;
-}
-
-static void set_pixel(const point2 &pixel, const uint32_t color) {
-    buffer[pixel.y * SCREEN_WIDTH + pixel.x] = color;
-}
-
 static inline float get_z(const polygon &polygon, const point2 &point) {
     return -(polygon.a * point.x + polygon.b * point.y + polygon.d) / polygon.c;
 }
@@ -40,7 +31,7 @@ static float get_angle(const point2 &o, const point2 &a, const point2 &b) {
     return result;
 }
 
-bool is_inside_polygon(const point2 &point, const polygon &polygon) {
+static bool is_inside_polygon(const point2 &point, const polygon &polygon) {
     float sum = get_angle(point, polygon.vertices[polygon.vertices.size() - 1],
                           polygon.vertices[0]);
 
@@ -50,48 +41,48 @@ bool is_inside_polygon(const point2 &point, const polygon &polygon) {
     return fabsf(sum) > 1e-5f;
 }
 
-inline bool on_segment(const point2 &p, const point2 &q, const point2 &r) {
+static inline bool on_segment(const point2 &p, const point2 &q, const point2 &r) {
     return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
            q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
 }
 
-inline int orientation(const point2 &p, const point2 &q, const point2 &r) {
+static int orientation(const point2 &p, const point2 &q, const point2 &r) {
     int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
     if (val == 0)
         return 0;
     return (val > 0) ? 1 : 2;
 }
 
-bool check_lines_intersection(const line2 &line_1, const line2 &line_2) {
-    int o1 = orientation(line_1.begin, line_1.end, line_2.begin);
-    int o2 = orientation(line_1.begin, line_1.end, line_2.end);
-    int o3 = orientation(line_2.begin, line_2.end, line_1.begin);
-    int o4 = orientation(line_2.begin, line_2.end, line_1.end);
+static bool check_lines_intersection(const line2 &line1, const line2 &line2) {
+    int o1 = orientation(line1.begin, line1.end, line2.begin);
+    int o2 = orientation(line1.begin, line1.end, line2.end);
+    int o3 = orientation(line2.begin, line2.end, line1.begin);
+    int o4 = orientation(line2.begin, line2.end, line1.end);
 
     // General case
     if (o1 != o2 && o3 != o4)
         return true;
 
     // Special Cases: p1, q1 and p2 are collinear and p2 lies on segment p1q1
-    if (o1 == 0 && on_segment(line_1.begin, line_2.begin, line_1.end))
+    if (o1 == 0 && on_segment(line1.begin, line2.begin, line1.end))
         return true;
 
     // p1, q1 and q2 are collinear and q2 lies on segment p1q1
-    if (o2 == 0 && on_segment(line_1.begin, line_2.end, line_1.end))
+    if (o2 == 0 && on_segment(line1.begin, line2.end, line1.end))
         return true;
 
     // p2, q2 and p1 are collinear and p1 lies on segment p2q2
-    if (o3 == 0 && on_segment(line_2.begin, line_1.begin, line_2.end))
+    if (o3 == 0 && on_segment(line2.begin, line1.begin, line2.end))
         return true;
 
     // p2, q2 and q1 are collinear and q1 lies on segment p2q2
-    if (o4 == 0 && on_segment(line_2.begin, line_1.end, line_2.end))
+    if (o4 == 0 && on_segment(line2.begin, line1.end, line2.end))
         return true;
 
     return false;
 }
 
-relationship check_relationship(const polygon &polygon, const window &window) {
+static relationship check_relationship(const polygon &polygon, const window &window) {
     uint16_t x_min = window.begin.x, x_max = window.end.x - 1;
     uint16_t y_min = window.begin.y, y_max = window.end.y - 1;
     point2 windows_vertices[4] = {{x_min, y_min}, {x_min, y_max}, {x_max, y_max}, {x_max, y_min}};
@@ -116,12 +107,8 @@ relationship check_relationship(const polygon &polygon, const window &window) {
                                                   : relationship::disjoint;
 }
 
-void fill_pixel(const point2 &point, std::vector<polygon> &polygons, const uint16_t bg_color) {
-    if (polygons.empty()) {
-        set_pixel(point, bg_color);
-        return;
-    }
-
+static void fill_pixel(const point2 &point, std::vector<polygon> &polygons,
+                       void set_pixel(point2, uint16_t)) {
     uint16_t color = polygons[0].color;
     float z_max = get_z(polygons[0], point);
     for (int i = 1; i < polygons.size(); ++i) {
@@ -135,7 +122,8 @@ void fill_pixel(const point2 &point, std::vector<polygon> &polygons, const uint1
     set_pixel(point, color);
 }
 
-void fill_window(const window &window, const uint16_t color) {
+void fill_window(const window &window, const uint16_t color,
+                 void set_pixel(point2, uint16_t)) {
     for (uint16_t x = window.begin.x; x < window.end.x; ++x) {
         for (uint16_t y = window.begin.y; y < window.end.y; ++y) {
             set_pixel({x, y}, color);
@@ -214,7 +202,8 @@ std::pair<bool, polygon> find_cover_polygon(const window &window, std::vector<po
     return {true, polygons[polygon_indices[0]]};
 }
 
-void warnock_render(const window &full_window, const uint16_t bg_color) {
+void warnock_render(const window &full_window, const uint16_t bg_color,
+                    void set_pixel(point2, uint16_t)) {
     std::stack<window> stack;
     stack.push(full_window);
 
@@ -239,18 +228,22 @@ void warnock_render(const window &full_window, const uint16_t bg_color) {
         uint16_t window_height = current_window.end.y - current_window.begin.y;
 
         if (window_width == 1 && window_height == 1) {
-            fill_pixel(current_window.begin, visible, bg_color);
+            if (visible.empty()) {
+                set_pixel(current_window.begin, bg_color);
+            } else {
+                fill_pixel(current_window.begin, visible, set_pixel);
+            }
         } else if (split_flag) {
             split_window(stack, current_window, visible);
         } else {
             if (visible.empty()) {
-                fill_window(current_window, bg_color);
+                fill_window(current_window, bg_color, set_pixel);
                 continue;
             }
 
             std::pair<bool, polygon> result = find_cover_polygon(current_window, visible);
             if (result.first) {
-                fill_window(current_window, result.second.color);
+                fill_window(current_window, result.second.color, set_pixel);
             } else {
                 split_window(stack, current_window, visible);
             }

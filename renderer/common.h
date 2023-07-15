@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "color.h"
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
@@ -12,7 +13,6 @@ struct point3 {
 };
 
 using vec3 = point3;
-using color = point3;
 using vertex = point3;
 
 struct point2 {
@@ -28,7 +28,7 @@ struct line2 {
 struct face {
     std::vector<size_t> vertex_indices;
     size_t normal_index;
-    color color;
+    material material;
 };
 
 struct object {
@@ -39,13 +39,8 @@ struct object {
 
 struct polygon {
     std::vector<point2> vertices;
-    uint32_t color;
+    uint16_t color;
     float a, b, c, d;
-};
-
-struct polygons {
-    size_t count;
-    polygon *array;
 };
 
 template <typename T>
