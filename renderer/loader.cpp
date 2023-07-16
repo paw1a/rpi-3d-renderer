@@ -76,8 +76,10 @@ bool load_objects(std::ifstream &ifs,
                     return false;
                 }
 
-                face.vertex_indices.push_back(stoull(indices[0]) - 1 - vertices_count.first);
-                face.normal_index = stoull(indices[2]) - 1 - normals_count.first;
+                face.vertex_indices.push_back(stoull(indices[0]) - 1 -
+                                              vertices_count.first);
+                face.normal_index =
+                    stoull(indices[2]) - 1 - normals_count.first;
             }
 
             object.faces.push_back(face);

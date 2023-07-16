@@ -20,7 +20,8 @@ struct material {
 };
 
 static inline uint16_t rgb_to_rgb565(const color &color) {
-    return ((color.r & 0b11111000) << 8) | ((color.g & 0b11111100) << 3) | (color.b >> 3);
+    return ((color.r & 0b11111000) << 8) | ((color.g & 0b11111100) << 3) |
+           (color.b >> 3);
 }
 
 static inline color rgb565_to_rgb(const uint16_t hex) {
@@ -30,8 +31,7 @@ static inline color rgb565_to_rgb(const uint16_t hex) {
 }
 
 static inline color material_color_to_rgb(const material_color color) {
-    return {static_cast<uint8_t>(color.r),
-            static_cast<uint8_t>(color.g),
+    return {static_cast<uint8_t>(color.r), static_cast<uint8_t>(color.g),
             static_cast<uint8_t>(color.b)};
 }
 

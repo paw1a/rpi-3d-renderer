@@ -2,7 +2,6 @@
 #include "common.h"
 #include <cmath>
 #include <map>
-#include <string>
 
 static void move_points(std::vector<point3> &points, const vec3 &diff) {
     for (auto &point : points) {
@@ -136,7 +135,8 @@ void adjust_data_to_display(std::map<std::string, object> &objects) {
     }
 }
 
-static uint16_t material_to_rgb565(const material &material, const std::vector<vec3> &lights,
+static uint16_t material_to_rgb565(const material &material,
+                                   const std::vector<vec3> &lights,
                                    const vec3 &normal) {
     float light_percent = 0.0;
     for (auto &light : lights) {
@@ -152,17 +152,18 @@ static uint16_t material_to_rgb565(const material &material, const std::vector<v
                             material.color.g * light_percent,
                             material.color.b * light_percent};
 
-    float max_primary_color = std::fmax(color.r / 255, std::fmax(color.g / 255, color.b / 255));
+    float max_primary_color =
+        std::fmax(color.r / 255, std::fmax(color.g / 255, color.b / 255));
     if (max_primary_color > 1.0)
-        color = {color.r / max_primary_color,
-                 color.g / max_primary_color,
+        color = {color.r / max_primary_color, color.g / max_primary_color,
                  color.b / max_primary_color};
 
-//    return random_rgb565_color();
+    //    return random_rgb565_color();
     return material_color_to_rgb565(color);
 }
 
-bool preprocess_objects(const std::map<std::string, object> &objects, const std::vector<vec3> &lights,
+bool preprocess_objects(const std::map<std::string, object> &objects,
+                        const std::vector<vec3> &lights,
                         std::vector<polygon> &polygons) {
     for (auto const &[name, object] : objects) {
         for (auto &face : object.faces) {
@@ -177,8 +178,8 @@ bool preprocess_objects(const std::map<std::string, object> &objects, const std:
                 polygon.vertices.push_back({x, y});
             }
 
-            polygon.color = material_to_rgb565(face.material, lights,
-                                               object.normals[face.normal_index]);
+            polygon.color = material_to_rgb565(
+                face.material, lights, object.normals[face.normal_index]);
             compute_plane_equation(vertices, polygon);
             polygons.push_back(polygon);
         }

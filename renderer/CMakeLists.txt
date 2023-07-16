@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} include)
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} math)
 
 add_executable(renderer
         main.cpp
@@ -13,6 +13,10 @@ add_executable(renderer
         debug.cpp
         pipeline.cpp
         render.cpp
+        math/mat4.cpp
+        math/quat.cpp
+        math/transform.cpp
+        math/vec3.cpp
         )
 
 target_link_libraries(renderer PRIVATE SDL2::SDL2 SDL2_image::SDL2_image)

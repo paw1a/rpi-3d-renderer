@@ -8,6 +8,7 @@
 #include "loader.h"
 #include "pipeline.h"
 #include "render.h"
+#include "math3d.h"
 
 static uint32_t sdl_color_to_uint32(SDL_Color color) {
     uint32_t num = color.r;
@@ -36,6 +37,7 @@ int main() {
 
     std::vector<vec3> lights = {
         {1, 1, 1},
+        {-1, -1, -1},
         {-1, -1, -1},
     };
 
@@ -113,7 +115,8 @@ int main() {
             }
         }
 
-        warnock_render({{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons}, BLACK, set_pixel);
+        warnock_render({{0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT}, polygons}, BLACK,
+                       set_pixel);
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
