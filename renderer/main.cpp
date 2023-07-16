@@ -6,9 +6,9 @@
 #include "common.h"
 #include "debug.h"
 #include "loader.h"
+#include "math3d.h"
 #include "pipeline.h"
 #include "render.h"
-#include "math3d.h"
 
 static uint32_t sdl_color_to_uint32(SDL_Color color) {
     uint32_t num = color.r;

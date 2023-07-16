@@ -21,4 +21,4 @@ struct tvec2 {
 typedef tvec2<float> vec2;
 typedef tvec2<int> ivec2;
 
-}
+} // namespace m3

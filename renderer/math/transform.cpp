@@ -37,8 +37,8 @@ transform mix(const transform &a, const transform &b, float t) {
     if (dot(a.rotation, bRot) < 0.0f) {
         bRot = -bRot;
     }
-    return {lerp(a.position, b.position, t),
-            nlerp(a.rotation, bRot, t), lerp(a.scale, b.scale, t)};
+    return {lerp(a.position, b.position, t), nlerp(a.rotation, bRot, t),
+            lerp(a.scale, b.scale, t)};
 }
 
 bool operator==(const transform &a, const transform &b) {
@@ -65,10 +65,11 @@ mat4 transform_to_mat4(const transform &t) {
     vec3 p = t.position;
 
     // Create matrix
-    return mat4{x.x, x.y, x.z, 0, // X basis (& Scale)
-                y.x, y.y, y.z, 0, // Y basis (& scale)
-                z.x, z.y, z.z, 0, // Z basis (& scale)
-                p.x, p.y, p.z, 1  // Position
+    return mat4{
+        x.x, x.y, x.z, 0, // X basis (& Scale)
+        y.x, y.y, y.z, 0, // Y basis (& scale)
+        z.x, z.y, z.z, 0, // Z basis (& scale)
+        p.x, p.y, p.z, 1  // Position
     };
 }
 
@@ -104,4 +105,4 @@ vec3 transform_vector(const transform &a, const vec3 &b) {
 
     return out;
 }
-}
+} // namespace m3

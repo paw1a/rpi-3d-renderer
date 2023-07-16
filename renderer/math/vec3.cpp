@@ -118,12 +118,12 @@ vec3 reflect(const vec3 &a, const vec3 &b) {
 
 vec3 cross(const vec3 &l, const vec3 &r) {
     return {l.y * r.z - l.z * r.y, l.z * r.x - l.x * r.z,
-                l.x * r.y - l.y * r.x};
+            l.x * r.y - l.y * r.x};
 }
 
 vec3 lerp(const vec3 &s, const vec3 &e, float t) {
     return {s.x + (e.x - s.x) * t, s.y + (e.y - s.y) * t,
-                s.z + (e.z - s.z) * t};
+            s.z + (e.z - s.z) * t};
 }
 
 vec3 slerp(const vec3 &s, const vec3 &e, float t) {
@@ -168,7 +168,7 @@ vec3 max(vec3 v, vec3 w) {
 
 vec3 clamp(vec3 v, vec3 min, vec3 max) {
     return {clamp(v.x, min.x, max.x), clamp(v.y, min.y, max.y),
-                clamp(v.z, min.z, max.z)};
+            clamp(v.z, min.z, max.z)};
 }
 
 void ortho_normalize(vec3 &normal, vec3 &tangent) {
@@ -184,4 +184,4 @@ vec3 rad2deg(vec3 rad) {
 vec3 deg2rad(vec3 deg) {
     return deg * PI / 180;
 }
-}
+} // namespace m3

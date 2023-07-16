@@ -154,7 +154,7 @@ quat operator*(const quat &q1,
 vec3 operator*(const quat &q, const vec3 &v) {
     return q.vector * 2.0f * dot(q.vector, v) +
            v * (q.scalar * q.scalar - dot(q.vector, q.vector)) +
-            cross(q.vector, v) * 2.0f * q.scalar;
+           cross(q.vector, v) * 2.0f * q.scalar;
 }
 
 quat mix(const quat &from, const quat &to, float t) {
@@ -209,8 +209,7 @@ mat4 quat_to_mat4(const quat &q) {
     vec3 u = q * vec3(0, 1, 0);
     vec3 f = q * vec3(0, 0, 1);
 
-    return {r.x, r.y, r.z, 0, u.x, u.y, u.z, 0, f.x, f.y, f.z, 0, 0, 0, 0,
-                1};
+    return {r.x, r.y, r.z, 0, u.x, u.y, u.z, 0, f.x, f.y, f.z, 0, 0, 0, 0, 1};
 }
 
 quat mat4_to_quat(const mat4 &m) {
@@ -250,4 +249,4 @@ float angle(quat a, quat b) {
     float num = min(abs(dot(a, b)), 1.0f);
     return (num > 0.999999f) ? 0.0f : (acos(num) * 2.0f * 57.29578f);
 }
-}
+} // namespace m3

@@ -17,15 +17,15 @@ bool operator!=(const mat4 &a, const mat4 &b) {
 
 mat4 operator*(const mat4 &m, float f) {
     return {m.xx * f, m.xy * f, m.xz * f, m.xw * f, m.yx * f, m.yy * f,
-                m.yz * f, m.yw * f, m.zx * f, m.zy * f, m.zz * f, m.zw * f,
-                m.tx * f, m.ty * f, m.tz * f, m.tw * f};
+            m.yz * f, m.yw * f, m.zx * f, m.zy * f, m.zz * f, m.zw * f,
+            m.tx * f, m.ty * f, m.tz * f, m.tw * f};
 }
 
 mat4 operator+(const mat4 &a, const mat4 &b) {
-    return {a.xx + b.xx, a.xy + b.xy, a.xz + b.xz, a.xw + b.xw, a.yx + b.yx,
-                a.yy + b.yy, a.yz + b.yz, a.yw + b.yw, a.zx + b.zx, a.zy + b.zy,
-                a.zz + b.zz, a.zw + b.zw, a.tx + b.tx, a.ty + b.ty, a.tz + b.tz,
-                a.tw + b.tw};
+    return {a.xx + b.xx, a.xy + b.xy, a.xz + b.xz, a.xw + b.xw,
+            a.yx + b.yx, a.yy + b.yy, a.yz + b.yz, a.yw + b.yw,
+            a.zx + b.zx, a.zy + b.zy, a.zz + b.zz, a.zw + b.zw,
+            a.tx + b.tx, a.ty + b.ty, a.tz + b.tz, a.tw + b.tw};
 }
 
 #define M4D(aRow, bCol)                                                        \
@@ -35,10 +35,11 @@ mat4 operator+(const mat4 &a, const mat4 &b) {
         a.v[3 * 4 + aRow] * b.v[bCol * 4 + 3]
 
 mat4 operator*(const mat4 &a, const mat4 &b) {
-    return {M4D(0, 0), M4D(1, 0), M4D(2, 0), M4D(3, 0), // Column 0
-                M4D(0, 1), M4D(1, 1), M4D(2, 1), M4D(3, 1), // Column 1
-                M4D(0, 2), M4D(1, 2), M4D(2, 2), M4D(3, 2), // Column 2
-                M4D(0, 3), M4D(1, 3), M4D(2, 3), M4D(3, 3)  // Column 3
+    return {
+        M4D(0, 0), M4D(1, 0), M4D(2, 0), M4D(3, 0), // Column 0
+        M4D(0, 1), M4D(1, 1), M4D(2, 1), M4D(3, 1), // Column 1
+        M4D(0, 2), M4D(1, 2), M4D(2, 2), M4D(3, 2), // Column 2
+        M4D(0, 3), M4D(1, 3), M4D(2, 3), M4D(3, 3)  // Column 3
     };
 }
 
@@ -48,24 +49,24 @@ mat4 operator*(const mat4 &a, const mat4 &b) {
 
 vec4 operator*(const mat4 &m, const vec4 &v) {
     return {M4V4D(0, v.x, v.y, v.z, v.w), M4V4D(1, v.x, v.y, v.z, v.w),
-                M4V4D(2, v.x, v.y, v.z, v.w), M4V4D(3, v.x, v.y, v.z, v.w)};
+            M4V4D(2, v.x, v.y, v.z, v.w), M4V4D(3, v.x, v.y, v.z, v.w)};
 }
 
 vec3 transform_vector(const mat4 &m, const vec3 &v) {
     return {M4V4D(0, v.x, v.y, v.z, 0.0f), M4V4D(1, v.x, v.y, v.z, 0.0f),
-                M4V4D(2, v.x, v.y, v.z, 0.0f)};
+            M4V4D(2, v.x, v.y, v.z, 0.0f)};
 }
 
 vec3 transform_point(const mat4 &m, const vec3 &v) {
     return {M4V4D(0, v.x, v.y, v.z, 1.0f), M4V4D(1, v.x, v.y, v.z, 1.0f),
-                M4V4D(2, v.x, v.y, v.z, 1.0f)};
+            M4V4D(2, v.x, v.y, v.z, 1.0f)};
 }
 
 vec3 transform_point(const mat4 &m, const vec3 &v, float &w) {
     float _w = w;
     w = M4V4D(3, v.x, v.y, v.z, _w);
     return {M4V4D(0, v.x, v.y, v.z, _w), M4V4D(1, v.x, v.y, v.z, _w),
-                M4V4D(2, v.x, v.y, v.z, _w)};
+            M4V4D(2, v.x, v.y, v.z, _w)};
 }
 
 #define M4SWAP(x, y)                                                           \
@@ -85,8 +86,8 @@ void transpose(mat4 &m) {
 }
 
 mat4 transposed(const mat4 &m) {
-    return {m.xx, m.yx, m.zx, m.tx, m.xy, m.yy, m.zy, m.ty, m.xz, m.yz,
-                m.zz, m.tz, m.xw, m.yw, m.zw, m.tw};
+    return {m.xx, m.yx, m.zx, m.tx, m.xy, m.yy, m.zy, m.ty,
+            m.xz, m.yz, m.zz, m.tz, m.xw, m.yw, m.zw, m.tw};
 }
 
 #define M4_3X3MINOR(c0, c1, c2, r0, r1, r2)                                    \
@@ -172,9 +173,22 @@ mat4 frustum(float l, float r, float b, float t, float n, float f) {
         std::cout << "WARNING: Trying to create invalid frustum\n";
         return {}; // Error
     }
-    return {(2.0f * n) / (r - l), 0, 0, 0, 0, (2.0f * n) / (t - b), 0, 0,
-                (r + l) / (r - l), (t + b) / (t - b), (-(f + n)) / (f - n), -1,
-                0, 0, (-2 * f * n) / (f - n), 0};
+    return {(2.0f * n) / (r - l),
+            0,
+            0,
+            0,
+            0,
+            (2.0f * n) / (t - b),
+            0,
+            0,
+            (r + l) / (r - l),
+            (t + b) / (t - b),
+            (-(f + n)) / (f - n),
+            -1,
+            0,
+            0,
+            (-2 * f * n) / (f - n),
+            0};
 }
 
 mat4 perspective(float fov, float aspect, float znear, float zfar) {
@@ -188,9 +202,22 @@ mat4 ortho(float l, float r, float b, float t, float n, float f) {
     if (l == r || t == b || n == f) {
         return {}; // Error
     }
-    return {2.0f / (r - l), 0, 0, 0, 0, 2.0f / (t - b), 0, 0, 0, 0,
-                -2.0f / (f - n), 0, -((r + l) / (r - l)), -((t + b) / (t - b)),
-                -((f + n) / (f - n)), 1};
+    return {2.0f / (r - l),
+            0,
+            0,
+            0,
+            0,
+            2.0f / (t - b),
+            0,
+            0,
+            0,
+            0,
+            -2.0f / (f - n),
+            0,
+            -((r + l) / (r - l)),
+            -((t + b) / (t - b)),
+            -((f + n) / (f - n)),
+            1};
 }
 
 mat4 look_at(const vec3 &position, const vec3 &target, const vec3 &up) {
@@ -205,9 +232,9 @@ mat4 look_at(const vec3 &position, const vec3 &target, const vec3 &up) {
 
     vec3 t = vec3(-dot(r, position), -dot(u, position), -dot(f, position));
 
-    return {
-        // Transpose upper 3x3 matrix to invert it
-        r.x, u.x, f.x, 0, r.y, u.y, f.y, 0, r.z, u.z, f.z, 0, t.x, t.y, t.z, 1};
+    return {// Transpose upper 3x3 matrix to invert it
+            r.x, u.x, f.x, 0, r.y, u.y, f.y, 0,
+            r.z, u.z, f.z, 0, t.x, t.y, t.z, 1};
 }
 
 vec3 to_euler(const mat4 &m, const std::string &order, bool degree) {
@@ -300,4 +327,4 @@ vec3 to_euler(const mat4 &m, const std::string &order, bool degree) {
 
     return euler;
 }
-}
+} // namespace m3

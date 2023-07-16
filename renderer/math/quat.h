@@ -65,4 +65,4 @@ vec3 to_euler(const quat &q, const std::string &order = "XYZ",
 // Rotates a rotation from towards to.
 quat rotate_towards(quat from, quat to, float max_degrees_delta);
 float angle(quat a, quat b);
-}
+} // namespace m3
