@@ -4,7 +4,6 @@
 #include "loader.h"
 #include <iostream>
 
-std::ostream &operator<<(std::ostream &os, const point3 &point);
 std::ostream &operator<<(std::ostream &os, const point2 &point);
 std::ostream &operator<<(std::ostream &os, const color &color);
 std::ostream &operator<<(std::ostream &os, const material &material);

@@ -1,9 +1,5 @@
 #include "debug.h"
 
-std::ostream &operator<<(std::ostream &os, const point3 &point) {
-    return os << '(' << point.x << "; " << point.y << "; " << point.z << ')';
-}
-
 std::ostream &operator<<(std::ostream &os, const point2 &point) {
     return os << '(' << point.x << "; " << point.y << ')';
 }

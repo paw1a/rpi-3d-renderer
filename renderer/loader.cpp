@@ -52,13 +52,13 @@ bool load_objects(std::ifstream &ifs,
         }
 
         if (tokens.size() == 4 && tokens[0] == "v") {
-            vertex vertex = {stof(tokens[1]), stof(tokens[2]), stof(tokens[3])};
+            m3::vec3 vertex = {stof(tokens[1]), stof(tokens[2]), stof(tokens[3])};
             object.vertices.push_back(vertex);
             ++vertices_count.second;
         }
 
         if (tokens.size() == 4 && tokens[0] == "vn") {
-            vec3 normal = {stof(tokens[1]), stof(tokens[2]), stof(tokens[3])};
+            m3::vec3 normal = {stof(tokens[1]), stof(tokens[2]), stof(tokens[3])};
             object.normals.push_back(normal);
             ++normals_count.second;
         }

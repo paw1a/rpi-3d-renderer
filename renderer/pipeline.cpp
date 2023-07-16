@@ -3,7 +3,7 @@
 #include <cmath>
 #include <map>
 
-static void move_points(std::vector<point3> &points, const vec3 &diff) {
+static void move_points(std::vector<m3::vec3> &points, const m3::vec3 &diff) {
     for (auto &point : points) {
         point.x += diff.x;
         point.y += diff.y;
@@ -11,7 +11,7 @@ static void move_points(std::vector<point3> &points, const vec3 &diff) {
     }
 }
 
-static void scale_points(std::vector<point3> &points, const float factor) {
+static void scale_points(std::vector<m3::vec3> &points, const float factor) {
     for (auto &point : points) {
         point.x *= factor;
         point.y *= factor;
@@ -19,15 +19,15 @@ static void scale_points(std::vector<point3> &points, const float factor) {
     }
 }
 
-static inline float scalar_product(const vec3 &vec1, const vec3 &vec2) {
+static inline float scalar_product(const m3::vec3 &vec1, const m3::vec3 &vec2) {
     return (vec1.x * vec2.x) + (vec1.y * vec2.y) + (vec1.z * vec2.z);
 }
 
-static inline float magnitude(const vec3 &vec) {
+static inline float magnitude(const m3::vec3 &vec) {
     return (sqrtf(powf(vec.x, 2) + powf(vec.y, 2) + powf(vec.z, 2)));
 }
 
-static inline float cos_angle(const vec3 &vec1, const vec3 &vec2) {
+static inline float cos_angle(const m3::vec3 &vec1, const m3::vec3 &vec2) {
     return scalar_product(vec1, vec2) / (magnitude(vec1) * magnitude(vec2));
 }
 
@@ -76,7 +76,7 @@ static bool solve_slae(std::vector<float> &res_column,
     return true;
 }
 
-static void compute_plane_equation(const std::vector<vertex> &vertices,
+static void compute_plane_equation(const std::vector<m3::vec3> &vertices,
                                    polygon &polygon) {
     polygon.a = polygon.b = polygon.c = 0;
     polygon.d = 1000;
@@ -119,7 +119,7 @@ void adjust_data_to_display(std::map<std::string, object> &objects) {
         }
     }
 
-    vec3 diff = {-xmin, -ymin, 0.};
+    m3::vec3 diff = {-xmin, -ymin, 0.};
     for (auto &[name, object] : objects)
         move_points(object.vertices, diff);
 
@@ -136,8 +136,8 @@ void adjust_data_to_display(std::map<std::string, object> &objects) {
 }
 
 static uint16_t material_to_rgb565(const material &material,
-                                   const std::vector<vec3> &lights,
-                                   const vec3 &normal) {
+                                   const std::vector<m3::vec3> &lights,
+                                   const m3::vec3 &normal) {
     float light_percent = 0.0;
     for (auto &light : lights) {
         float percent = cos_angle(light, normal);
@@ -163,11 +163,11 @@ static uint16_t material_to_rgb565(const material &material,
 }
 
 bool preprocess_objects(const std::map<std::string, object> &objects,
-                        const std::vector<vec3> &lights,
+                        const std::vector<m3::vec3> &lights,
                         std::vector<polygon> &polygons) {
     for (auto const &[name, object] : objects) {
         for (auto &face : object.faces) {
-            std::vector<vertex> vertices;
+            std::vector<m3::vec3> vertices;
             for (auto &index : face.vertex_indices)
                 vertices.push_back(object.vertices[index]);
 
@@ -175,7 +175,7 @@ bool preprocess_objects(const std::map<std::string, object> &objects,
             for (auto &vertex : vertices) {
                 auto x = static_cast<uint16_t>(vertex.x);
                 auto y = static_cast<uint16_t>(vertex.y);
-                polygon.vertices.push_back({x, y});
+                polygon.vertices.emplace_back(x, y);
             }
 
             polygon.color = material_to_rgb565(

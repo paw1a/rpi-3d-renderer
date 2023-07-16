@@ -1,24 +1,13 @@
 #pragma once
 
 #include "color.h"
+#include "math3d.h"
 #include <vector>
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
 
-struct point3 {
-    float x;
-    float y;
-    float z;
-};
-
-using vec3 = point3;
-using vertex = point3;
-
-struct point2 {
-    uint16_t x;
-    uint16_t y;
-};
+using point2 = m3::tvec2<uint16_t>;
 
 struct line2 {
     point2 begin;
@@ -33,8 +22,8 @@ struct face {
 
 struct object {
     std::vector<face> faces;
-    std::vector<point3> vertices;
-    std::vector<vec3> normals;
+    std::vector<m3::vec3> vertices;
+    std::vector<m3::vec3> normals;
 };
 
 struct polygon {

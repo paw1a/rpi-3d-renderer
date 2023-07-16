@@ -35,7 +35,7 @@ int main() {
         return -1;
     }
 
-    std::vector<vec3> lights = {
+    std::vector<m3::vec3> lights = {
         {1, 1, 1},
         {-1, -1, -1},
         {-1, -1, -1},
