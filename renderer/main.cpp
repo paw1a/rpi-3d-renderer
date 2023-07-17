@@ -25,7 +25,7 @@ static void set_pixel(point2 point, uint16_t rgb565_color) {
     color rgb_color = rgb565_to_rgb(rgb565_color);
     SDL_Color sdl_color = {rgb_color.r, rgb_color.g, rgb_color.b, 255};
     pixels[(point.y + SCREEN_HEIGHT / 2) * SCREEN_WIDTH +
-    (point.x + SCREEN_WIDTH / 2)] = sdl_color_to_uint32(sdl_color);
+           (point.x + SCREEN_WIDTH / 2)] = sdl_color_to_uint32(sdl_color);
 }
 
 int main() {
@@ -54,8 +54,8 @@ int main() {
         std::cout << object << std::endl;
     }
 
-//    for (auto &polygon : polygons)
-//        std::cout << polygon << std::endl;
+    //    for (auto &polygon : polygons)
+    //        std::cout << polygon << std::endl;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("failed to init sdl: %s\n", SDL_GetError());
@@ -113,10 +113,12 @@ int main() {
         }
 
         angle += 0.5;
-        m3::mat4 camara_rotate = m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
+        m3::mat4 camara_rotate =
+            m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
         m3::mat4 scale = m3::scale({2000, 2000, 2000});
-        m3::mat4 view = m3::look_at(m3::transform_vector(camara_rotate, camera_pos),
-                                    m3::transform_vector(camara_rotate, target), {0, 1, 0});
+        m3::mat4 view =
+            m3::look_at(m3::transform_vector(camara_rotate, camera_pos),
+                        m3::transform_vector(camara_rotate, target), {0, 1, 0});
         m3::mat4 perspective = m3::perspective(80, 1, 1.1f, 10.0f);
         m3::mat4 transform = scale * perspective * view;
 
@@ -134,7 +136,9 @@ int main() {
         }
 
         warnock_render({{-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2},
-                        {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2}, polygons}, BLACK, set_pixel);
+                        {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2},
+                        polygons},
+                       BLACK, set_pixel);
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);

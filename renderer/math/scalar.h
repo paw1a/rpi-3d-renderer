@@ -42,4 +42,4 @@ inline float atan2(float y, float x) {
 inline float acos(float x) {
     return std::acos(x);
 }
-}
+} // namespace m3

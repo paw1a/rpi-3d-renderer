@@ -119,9 +119,9 @@ void adjust_data_to_display(std::map<std::string, object> &objects) {
         }
     }
 
-//    m3::vec3 diff = {-xmin, -ymin, 0.};
-//    for (auto &[name, object] : objects)
-//        move_points(object.vertices, diff);
+    //    m3::vec3 diff = {-xmin, -ymin, 0.};
+    //    for (auto &[name, object] : objects)
+    //        move_points(object.vertices, diff);
 
     xmax -= xmin;
     ymax -= ymin;

@@ -123,4 +123,4 @@ mat4 perspective(float fov, float aspect, float znear, float zfar);
 mat4 ortho(float l, float r, float b, float t, float n, float f);
 mat4 look_at(const vec3 &position, const vec3 &target, const vec3 &up);
 vec3 to_euler(const mat4 &m, const std::string &order, bool degree = true);
-}
+} // namespace m3
