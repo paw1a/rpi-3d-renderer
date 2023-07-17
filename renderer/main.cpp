@@ -30,7 +30,7 @@ static void set_pixel(point2 point, uint16_t rgb565_color) {
 
 int main() {
     std::map<std::string, material> materials;
-    std::ifstream material_file("../cube.mtl", std::ios::in);
+    std::ifstream material_file("../monkey.mtl", std::ios::in);
     if (!load_materials(material_file, materials)) {
         printf("failed to load materials\n");
         return -1;
@@ -43,7 +43,7 @@ int main() {
     };
 
     std::map<std::string, object> objects;
-    std::ifstream object_file("../cube.obj", std::ios::in);
+    std::ifstream object_file("../monkey.obj", std::ios::in);
     if (!load_objects(object_file, materials, objects)) {
         printf("failed to load objects\n");
         return -1;
@@ -87,8 +87,8 @@ int main() {
 
     pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
 
-    m3::vec3 camera_pos = {0, 0, 20};
-    m3::vec3 target = {0, 1, 0};
+    m3::vec3 camera_pos = {0, 0, 7};
+    m3::vec3 up = {0, 1, 0};
     float angle = 0;
 
     bool quit = false;
@@ -112,13 +112,15 @@ int main() {
             }
         }
 
-        angle += 0.5;
+        auto begin = std::chrono::steady_clock::now();
+
+        angle += 3;
         m3::mat4 camara_rotate =
             m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
         m3::mat4 scale = m3::scale({2000, 2000, 2000});
         m3::mat4 view =
-            m3::look_at(m3::transform_vector(camara_rotate, camera_pos),
-                        m3::transform_vector(camara_rotate, target), {0, 1, 0});
+            m3::look_at(m3::transform_vector(camara_rotate, camera_pos), {0, 0, 0},
+                        m3::transform_vector(camara_rotate, up));
         m3::mat4 perspective = m3::perspective(80, 1, 1.1f, 10.0f);
         m3::mat4 transform = scale * perspective * view;
 
@@ -135,10 +137,18 @@ int main() {
             return -1;
         }
 
+        auto end = std::chrono::steady_clock::now();
+        std::cout << "preprocess time = " <<
+        std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
+
+        begin = std::chrono::steady_clock::now();
         warnock_render({{-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2},
                         {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2},
                         polygons},
                        BLACK, set_pixel);
+        end = std::chrono::steady_clock::now();
+        std::cout << "render time = " <<
+        std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);

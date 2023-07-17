@@ -205,12 +205,15 @@ std::pair<bool, polygon> find_cover_polygon(const window &window,
     return {true, polygons[polygon_indices[0]]};
 }
 
+static int counter;
+
 void warnock_render(const window &full_window, const uint16_t bg_color,
                     void set_pixel(point2, uint16_t)) {
     std::stack<window> stack;
     stack.push(full_window);
 
     while (!stack.empty()) {
+        counter++;
         window current_window = stack.top();
         stack.pop();
 
@@ -253,4 +256,7 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
             }
         }
     }
+
+    std::cout << "counter " << counter << std::endl;
+    counter = 0;
 }

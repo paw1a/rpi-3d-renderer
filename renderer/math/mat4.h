@@ -18,20 +18,19 @@ struct mat4 {
             vec4 position;
         };
         struct {
-            //            row 1     row 2     row 3     row 4
-            /* column 1 */ float xx;
+            float xx;
             float xy;
             float xz;
             float xw;
-            /* column 2 */ float yx;
+            float yx;
             float yy;
             float yz;
             float yw;
-            /* column 3 */ float zx;
+            float zx;
             float zy;
             float zz;
             float zw;
-            /* column 4 */ float tx;
+            float tx;
             float ty;
             float tz;
             float tw;
@@ -123,4 +122,4 @@ mat4 perspective(float fov, float aspect, float znear, float zfar);
 mat4 ortho(float l, float r, float b, float t, float n, float f);
 mat4 look_at(const vec3 &position, const vec3 &target, const vec3 &up);
 vec3 to_euler(const mat4 &m, const std::string &order, bool degree = true);
-} // namespace m3
+}
