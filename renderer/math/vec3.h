@@ -72,4 +72,4 @@ void ortho_normalize(vec3 &normal, vec3 &tangent);
 
 vec3 rad2deg(vec3 rad);
 vec3 deg2rad(vec3 deg);
-} // namespace m3
+}

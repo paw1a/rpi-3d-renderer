@@ -30,4 +30,4 @@ mat4 transform_to_mat4(const transform &t);
 transform mat4_to_transform(const mat4 &m);
 vec3 transform_point(const transform &a, const vec3 &b);
 vec3 transform_vector(const transform &a, const vec3 &b);
-} // namespace m3
+}

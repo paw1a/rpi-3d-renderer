@@ -10,6 +10,7 @@ namespace m3 {
 struct mat4 {
     union {
         float v[16];
+        float m[4][4];
         struct {
             vec4 right;
             vec4 up;
@@ -72,7 +73,6 @@ struct mat4 {
             float r3c3;
         };
     };
-    // Include constructors here
 
     inline mat4()
         : xx(1), xy(0), xz(0), xw(0), yx(0), yy(1), yz(0), yw(0), zx(0), zy(0),
@@ -103,18 +103,24 @@ mat4 operator*(const mat4 &a, const mat4 &b);
 vec4 operator*(const mat4 &m, const vec4 &v);
 std::ostream &operator<<(std::ostream &output, const mat4 &m);
 
-vec3 transform_vector(const mat4 &m, const vec3 &v);
-vec3 transform_point(const mat4 &m, const vec3 &v);
-vec3 transform_point(const mat4 &m, const vec3 &v, float &w);
 void transpose(mat4 &m);
 mat4 transposed(const mat4 &m);
 float determinant(const mat4 &m);
 mat4 adjugate(const mat4 &m);
 mat4 inverse(const mat4 &m);
 void invert(mat4 &m);
+
+vec3 transform_vector(const mat4 &m, const vec3 &v);
+
+mat4 translate(const vec3 &v);
+mat4 scale(const vec3 &v);
+mat4 rotate_x(float angle);
+mat4 rotate_y(float angle);
+mat4 rotate_z(float angle);
+
 mat4 frustum(float l, float r, float b, float t, float n, float f);
 mat4 perspective(float fov, float aspect, float znear, float zfar);
 mat4 ortho(float l, float r, float b, float t, float n, float f);
 mat4 look_at(const vec3 &position, const vec3 &target, const vec3 &up);
 vec3 to_euler(const mat4 &m, const std::string &order, bool degree = true);
-} // namespace m3
+}

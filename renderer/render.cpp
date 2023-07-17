@@ -85,8 +85,8 @@ static bool check_lines_intersection(const line2 &line1, const line2 &line2) {
 
 static relationship check_relationship(const polygon &polygon,
                                        const window &window) {
-    uint16_t x_min = window.begin.x, x_max = window.end.x - 1;
-    uint16_t y_min = window.begin.y, y_max = window.end.y - 1;
+    int16_t x_min = window.begin.x, x_max = window.end.x - 1;
+    int16_t y_min = window.begin.y, y_max = window.end.y - 1;
     point2 windows_vertices[4] = {
         {x_min, y_min}, {x_min, y_max}, {x_max, y_max}, {x_max, y_min}};
 
@@ -127,8 +127,8 @@ static void fill_pixel(const point2 &point, std::vector<polygon> &polygons,
 
 void fill_window(const window &window, const uint16_t color,
                  void set_pixel(point2, uint16_t)) {
-    for (uint16_t x = window.begin.x; x < window.end.x; ++x) {
-        for (uint16_t y = window.begin.y; y < window.end.y; ++y) {
+    for (int16_t x = window.begin.x; x < window.end.x; ++x) {
+        for (int16_t y = window.begin.y; y < window.end.y; ++y) {
             set_pixel({x, y}, color);
         }
     }
@@ -136,11 +136,11 @@ void fill_window(const window &window, const uint16_t color,
 
 void split_window(std::stack<window> &stack, const window &window,
                   std::vector<polygon> &polygons) {
-    uint16_t x_split = window.begin.x + ((window.end.x - window.begin.x) >> 1);
-    uint16_t y_split = window.begin.y + ((window.end.y - window.begin.y) >> 1);
+    int16_t x_split = window.begin.x + ((window.end.x - window.begin.x) / 2);
+    int16_t y_split = window.begin.y + ((window.end.y - window.begin.y) / 2);
 
-    uint16_t window_width = window.end.x - window.begin.x;
-    uint16_t window_height = window.end.y - window.begin.y;
+    int16_t window_width = window.end.x - window.begin.x;
+    int16_t window_height = window.end.y - window.begin.y;
 
     if (window_width > 1 && window_height > 1) {
         stack.push(
@@ -170,8 +170,8 @@ void split_window(std::stack<window> &stack, const window &window,
 
 std::pair<bool, polygon> find_cover_polygon(const window &window,
                                             std::vector<polygon> &polygons) {
-    auto window_end_x = static_cast<uint16_t>(window.end.x - 1);
-    auto window_end_y = static_cast<uint16_t>(window.end.y - 1);
+    auto window_end_x = static_cast<int16_t>(window.end.x - 1);
+    auto window_end_y = static_cast<int16_t>(window.end.y - 1);
 
     point2 window_vertices[4] = {{window.begin.x, window.begin.y},
                                  {window.begin.x, window_end_y},

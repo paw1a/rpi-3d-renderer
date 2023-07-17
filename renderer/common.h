@@ -7,7 +7,7 @@
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
 
-using point2 = m3::tvec2<uint16_t>;
+using point2 = m3::tvec2<int16_t>;
 
 struct line2 {
     point2 begin;

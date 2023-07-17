@@ -44,8 +44,8 @@ mat4 operator*(const mat4 &a, const mat4 &b) {
 }
 
 #define M4V4D(mRow, x, y, z, w)                                                \
-    x *m.v[0 * 4 + mRow] + y *m.v[1 * 4 + mRow] + z *m.v[2 * 4 + mRow] +       \
-        w *m.v[3 * 4 + mRow]
+    ((x) *m.v[0 * 4 + (mRow)] + (y) *m.v[1 * 4 + (mRow)] + (z) *m.v[2 * 4 + (mRow)] +       \
+        (w) *m.v[3 * 4 + (mRow)])
 
 vec4 operator*(const mat4 &m, const vec4 &v) {
     return {M4V4D(0, v.x, v.y, v.z, v.w), M4V4D(1, v.x, v.y, v.z, v.w),
@@ -53,20 +53,64 @@ vec4 operator*(const mat4 &m, const vec4 &v) {
 }
 
 vec3 transform_vector(const mat4 &m, const vec3 &v) {
-    return {M4V4D(0, v.x, v.y, v.z, 0.0f), M4V4D(1, v.x, v.y, v.z, 0.0f),
-            M4V4D(2, v.x, v.y, v.z, 0.0f)};
+    float a = v.v[0] * m.m[0][0] + v.v[1] * m.m[1][0] + v.v[2] * m.m[2][0] + m.m[3][0];
+    float b = v.v[0] * m.m[0][1] + v.v[1] * m.m[1][1] + v.v[2] * m.m[2][1] + m.m[3][1];
+    float c = v.v[0] * m.m[0][2] + v.v[1] * m.m[1][2] + v.v[2] * m.m[2][2] + m.m[3][2];
+    float w = v.v[0] * m.m[0][3] + v.v[1] * m.m[1][3] + v.v[2] * m.m[2][3] + m.m[3][3];
+
+    float one_over_w = 1.0f / w;
+    return {a * one_over_w, b * one_over_w, c * one_over_w};
 }
 
-vec3 transform_point(const mat4 &m, const vec3 &v) {
-    return {M4V4D(0, v.x, v.y, v.z, 1.0f), M4V4D(1, v.x, v.y, v.z, 1.0f),
-            M4V4D(2, v.x, v.y, v.z, 1.0f)};
+mat4 translate(const vec3 &v) {
+    return {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        v.x, v.y, v.z, 1
+    };
 }
 
-vec3 transform_point(const mat4 &m, const vec3 &v, float &w) {
-    float _w = w;
-    w = M4V4D(3, v.x, v.y, v.z, _w);
-    return {M4V4D(0, v.x, v.y, v.z, _w), M4V4D(1, v.x, v.y, v.z, _w),
-            M4V4D(2, v.x, v.y, v.z, _w)};
+mat4 scale(const vec3 &v) {
+    return {
+        v.x, 0, 0, 0,
+        0, v.y, 0, 0,
+        0, 0, v.z, 0,
+        0, 0, 0, 1
+    };
+}
+
+mat4 rotate_x(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return {
+        1, 0, 0, 0,
+        0, c, -s, 0,
+        0, s, c, 0,
+        0, 0, 0, 1
+    };
+}
+
+mat4 rotate_y(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return {
+        c, 0, s, 0,
+        0, 1, 0, 0,
+        -s, 0, c, 0,
+        0, 0, 0, 1
+    };
+}
+
+mat4 rotate_z(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return {
+        c, s, 0, 0,
+        -s, c, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
 }
 
 #define M4SWAP(x, y)                                                           \
@@ -184,12 +228,13 @@ mat4 frustum(float l, float r, float b, float t, float n, float f) {
             (r + l) / (r - l),
             (t + b) / (t - b),
             (-(f + n)) / (f - n),
-            -1,
+            1,
             0,
             0,
             (-2 * f * n) / (f - n),
             0};
 }
+
 
 mat4 perspective(float fov, float aspect, float znear, float zfar) {
     float ymax = znear * tanf(fov * 3.14159265359f / 360.0f);
@@ -327,4 +372,4 @@ vec3 to_euler(const mat4 &m, const std::string &order, bool degree) {
 
     return euler;
 }
-} // namespace m3
+}

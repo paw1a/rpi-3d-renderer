@@ -119,9 +119,9 @@ void adjust_data_to_display(std::map<std::string, object> &objects) {
         }
     }
 
-    m3::vec3 diff = {-xmin, -ymin, 0.};
-    for (auto &[name, object] : objects)
-        move_points(object.vertices, diff);
+//    m3::vec3 diff = {-xmin, -ymin, 0.};
+//    for (auto &[name, object] : objects)
+//        move_points(object.vertices, diff);
 
     xmax -= xmin;
     ymax -= ymin;
@@ -158,7 +158,7 @@ static uint16_t material_to_rgb565(const material &material,
         color = {color.r / max_primary_color, color.g / max_primary_color,
                  color.b / max_primary_color};
 
-    //    return random_rgb565_color();
+    return random_rgb565_color();
     return material_color_to_rgb565(color);
 }
 
@@ -173,8 +173,8 @@ bool preprocess_objects(const std::map<std::string, object> &objects,
 
             polygon polygon;
             for (auto &vertex : vertices) {
-                auto x = static_cast<uint16_t>(vertex.x);
-                auto y = static_cast<uint16_t>(vertex.y);
+                auto x = (int16_t)(vertex.x);
+                auto y = (int16_t)(vertex.y);
                 polygon.vertices.emplace_back(x, y);
             }
 
