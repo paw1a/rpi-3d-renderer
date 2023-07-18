@@ -36,7 +36,7 @@ inline float abs(float x) {
 }
 
 inline float atan2(float y, float x) {
-    return std::atan2f(y, x);
+    return atan2f(y, x);
 }
 
 inline float acos(float x) {

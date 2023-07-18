@@ -17,7 +17,7 @@ struct quat {
         struct {
             vec3 vector;
             float scalar;
-        };
+        } q;
         float v[4];
     };
 

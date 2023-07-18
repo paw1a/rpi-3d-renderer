@@ -338,8 +338,6 @@ vec3 to_euler(const mat4 &m, const std::string &order, bool degree) {
             x = std::atan2(-l, e);
             y = 0;
         }
-    } else {
-        throw std::runtime_error("Bad order!");
     }
 
     if (degree) {

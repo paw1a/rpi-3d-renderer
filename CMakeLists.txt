@@ -3,18 +3,35 @@ cmake_minimum_required(VERSION 3.13)
 include(pico_sdk_import.cmake)
 include(pico_libs_import.cmake)
 
-project(rpi_3d_renderer_project C CXX ASM)
+project(renderer C CXX ASM)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 pico_sdk_init()
 
-include_directories(include)
-
-add_executable(rpi_3d_renderer
-        src/main.cpp
+set(COMMON_SOURCES
+        src/render/debug.cpp
+        src/render/pipeline.cpp
+        src/render/render.cpp
+        src/math/mat4.cpp
+        src/math/quat.cpp
+        src/math/transform.cpp
+        src/math/vec3.cpp
+        src/scene/scene.cpp
         )
 
-pico_add_extra_outputs(rpi_3d_renderer)
-target_link_libraries(rpi_3d_renderer pico_stdlib pico_stdio ili934x hardware_gpio hardware_spi)
+set(RPI_PICO_SOURCES
+        src/rpi-pico/main.cpp
+        src/desktop/loader.cpp
+        )
+
+add_executable(rpi-pico ${COMMON_SOURCES} ${RPI_PICO_SOURCES})
+
+pico_add_extra_outputs(rpi-pico)
+
+include_directories(src/math src/render src/loader src/rpi-pico)
+
+target_link_libraries(rpi-pico PRIVATE pico_stdlib pico_stdio ili934x hardware_gpio hardware_spi)

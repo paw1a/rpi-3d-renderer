@@ -1,21 +1,20 @@
-#include <stdio.h>
-#include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "ili934x.h"
+#include "pico/stdlib.h"
+#include <stdio.h>
 
 #define SPI_PORT spi0
 
 #define PIN_MISO 4
-#define PIN_CS   5
-#define PIN_SCK  6
+#define PIN_CS 5
+#define PIN_SCK 6
 #define PIN_MOSI 7
-#define PIN_DC   8
-#define PIN_RST  9
+#define PIN_DC 8
+#define PIN_RST 9
 
 uint64_t lastTime1hz = 0;
 
-int main()
-{
+int main() {
     stdio_init_all();
 
     spi_init(SPI_PORT, 500 * 1000);
@@ -33,14 +32,12 @@ int main()
     display->reset();
     display->init();
 
-    while (1)
-    {
-        if (lastTime1hz + 1000000 < time_us_64())
-        {
+    while (1) {
+        if (lastTime1hz + 1000000 < time_us_64()) {
             lastTime1hz = time_us_64();
 
             display->clear();
-            display->drawCircle(50, 50, 25, display->colour565(255,0,0));
+            display->drawCircle(50, 50, 25, display->colour565(255, 0, 0));
         }
     }
 

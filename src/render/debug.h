@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../loader/loader.h"
 #include "common.h"
-#include "loader.h"
 #include <iostream>
 
 std::ostream &operator<<(std::ostream &os, const point2 &point);

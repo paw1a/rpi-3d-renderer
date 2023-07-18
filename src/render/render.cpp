@@ -13,7 +13,9 @@ enum class relationship {
 };
 
 static inline float get_z(const polygon &polygon, const point2 &point) {
-    return -(polygon.a * (float)point.x + polygon.b * (float)point.y + polygon.d) / polygon.c;
+    return -(polygon.a * (float)point.x + polygon.b * (float)point.y +
+             polygon.d) /
+           polygon.c;
 }
 
 static inline float get_azimuth(const point2 &o, const point2 &p) {
@@ -230,15 +232,12 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
             }
         }
 
-        array<polygon> visible = {current_window.polygons.data + disjoint_cursor,
-                                  current_window.polygons.size - disjoint_cursor};
+        array<polygon> visible = {
+            current_window.polygons.data + disjoint_cursor,
+            current_window.polygons.size - disjoint_cursor};
 
         uint16_t window_width = current_window.end.x - current_window.begin.x;
         uint16_t window_height = current_window.end.y - current_window.begin.y;
-
-        if (surrounding_cursor != disjoint_cursor) {
-
-        }
 
         if (window_width == 1 && window_height == 1) {
             if (visible.size == 0) {

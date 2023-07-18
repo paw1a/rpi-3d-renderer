@@ -152,9 +152,9 @@ quat operator*(const quat &q1,
 }
 
 vec3 operator*(const quat &q, const vec3 &v) {
-    return q.vector * 2.0f * dot(q.vector, v) +
-           v * (q.scalar * q.scalar - dot(q.vector, q.vector)) +
-           cross(q.vector, v) * 2.0f * q.scalar;
+    return q.q.vector * 2.0f * dot(q.q.vector, v) +
+           v * (q.q.scalar * q.q.scalar - dot(q.q.vector, q.q.vector)) +
+           cross(q.q.vector, v) * 2.0f * q.q.scalar;
 }
 
 quat mix(const quat &from, const quat &to, float t) {
@@ -166,8 +166,8 @@ quat nlerp(const quat &from, const quat &to, float t) {
 }
 
 quat operator^(const quat &q, float f) {
-    float angle = 2.0f * acosf(q.scalar);
-    vec3 axis = normalized(q.vector);
+    float angle = 2.0f * acosf(q.q.scalar);
+    vec3 axis = normalized(q.q.vector);
 
     float halfCos = cosf(f * angle * 0.5f);
     float halfSin = sinf(f * angle * 0.5f);
@@ -213,8 +213,9 @@ mat4 quat_to_mat4(const quat &q) {
 }
 
 quat mat4_to_quat(const mat4 &m) {
-    vec3 up = normalized(vec3(m.up.x, m.up.y, m.up.z));
-    vec3 forward = normalized(vec3(m.forward.x, m.forward.y, m.forward.z));
+    vec3 up = normalized(vec3(m.s.up.x, m.s.up.y, m.s.up.z));
+    vec3 forward =
+        normalized(vec3(m.s.forward.x, m.s.forward.y, m.s.forward.z));
     vec3 right = cross(up, forward);
     up = cross(forward, right);
 

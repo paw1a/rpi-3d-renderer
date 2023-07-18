@@ -17,7 +17,7 @@ struct line2 {
 struct face {
     std::vector<size_t> vertex_indices;
     size_t normal_index;
-    material material;
+    struct material material;
 };
 
 struct object {
