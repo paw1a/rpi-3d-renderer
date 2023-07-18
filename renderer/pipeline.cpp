@@ -62,8 +62,9 @@ static bool solve_slae(std::vector<float> &res_column,
     }
 
     if (abs(matrix[rows_count - 1][columns_count - 1]) <=
-        std::numeric_limits<float>::epsilon())
+        std::numeric_limits<float>::epsilon()) {
         return false;
+    }
 
     for (int i = rows_count - 1; i >= 0; i--) {
         float sum = 0;
@@ -164,7 +165,8 @@ static uint16_t material_to_rgb565(const material &material,
 
 bool preprocess_objects(const std::map<std::string, object> &objects,
                         const std::vector<m3::vec3> &lights,
-                        std::vector<polygon> &polygons) {
+                        array<polygon> &polygons) {
+    size_t i = 0;
     for (auto const &[name, object] : objects) {
         for (auto &face : object.faces) {
             std::vector<m3::vec3> vertices;
@@ -173,15 +175,15 @@ bool preprocess_objects(const std::map<std::string, object> &objects,
 
             polygon polygon;
             for (auto &vertex : vertices) {
-                auto x = (int16_t)(vertex.x);
-                auto y = (int16_t)(vertex.y);
+                auto x = static_cast<int16_t>(vertex.x);
+                auto y = static_cast<int16_t>(vertex.y);
                 polygon.vertices.emplace_back(x, y);
             }
 
             polygon.color = material_to_rgb565(
                 face.material, lights, object.normals[face.normal_index]);
             compute_plane_equation(vertices, polygon);
-            polygons.push_back(polygon);
+            polygons.data[i++] = polygon;
         }
     }
 

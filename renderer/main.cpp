@@ -87,7 +87,13 @@ int main() {
 
     pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
 
-    m3::vec3 camera_pos = {0, 0, 7};
+    size_t polygons_size = 0;
+    for (auto &[name, object] : objects)
+        polygons_size += object.faces.size();
+
+    array<polygon> polygons = {new polygon[polygons_size], polygons_size};
+
+    m3::vec3 camera_pos = {0, 0, 10};
     m3::vec3 up = {0, 1, 0};
     float angle = 0;
 
@@ -107,6 +113,7 @@ int main() {
                     quit = true;
                     break;
                 case SDLK_UP:
+                    angle += 0.5;
                     break;
                 }
             }
@@ -114,7 +121,6 @@ int main() {
 
         auto begin = std::chrono::steady_clock::now();
 
-        angle += 3;
         m3::mat4 camara_rotate =
             m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
         m3::mat4 scale = m3::scale({2000, 2000, 2000});
@@ -131,30 +137,31 @@ int main() {
             }
         }
 
-        std::vector<polygon> polygons;
         if (!preprocess_objects(temp_objects, lights, polygons)) {
             printf("failed to preprocess objects\n");
             return -1;
         }
 
         auto end = std::chrono::steady_clock::now();
-        std::cout << "preprocess time = " <<
-        std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
+//        std::cout << "preprocess time = " <<
+//        std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
 
         begin = std::chrono::steady_clock::now();
         warnock_render({{-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2},
                         {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2},
                         polygons},
                        BLACK, set_pixel);
+
         end = std::chrono::steady_clock::now();
-        std::cout << "render time = " <<
-        std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
+//        std::cout << "render time = " <<
+//        std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
         SDL_RenderPresent(renderer);
     }
 
+    delete[] polygons.data;
     delete[] pixels;
     SDL_DestroyWindow(window);
     SDL_Quit();

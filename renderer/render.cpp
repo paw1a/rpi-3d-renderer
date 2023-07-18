@@ -1,7 +1,6 @@
 #include <cmath>
 #include <limits>
 #include <stack>
-#include <vector>
 
 #include "common.h"
 #include "render.h"
@@ -14,7 +13,7 @@ enum class relationship {
 };
 
 static inline float get_z(const polygon &polygon, const point2 &point) {
-    return -(polygon.a * point.x + polygon.b * point.y + polygon.d) / polygon.c;
+    return -(polygon.a * (float)point.x + polygon.b * (float)point.y + polygon.d) / polygon.c;
 }
 
 static inline float get_azimuth(const point2 &o, const point2 &p) {
@@ -29,16 +28,6 @@ static float get_angle(const point2 &o, const point2 &a, const point2 &b) {
         result += 2 * M_PI;
 
     return result;
-}
-
-static bool is_inside_polygon(const point2 &point, const polygon &polygon) {
-    float sum = get_angle(point, polygon.vertices[polygon.vertices.size() - 1],
-                          polygon.vertices[0]);
-
-    for (int i = 0; i < polygon.vertices.size() - 1; ++i)
-        sum += get_angle(point, polygon.vertices[i], polygon.vertices[i + 1]);
-
-    return fabsf(sum) > 1e-5f;
 }
 
 static inline bool on_segment(const point2 &p, const point2 &q,
@@ -83,6 +72,16 @@ static bool check_lines_intersection(const line2 &line1, const line2 &line2) {
     return false;
 }
 
+static bool is_inside_polygon(const point2 &point, const polygon &polygon) {
+    float sum = get_angle(point, polygon.vertices[polygon.vertices.size() - 1],
+                          polygon.vertices[0]);
+
+    for (int i = 0; i < polygon.vertices.size() - 1; ++i)
+        sum += get_angle(point, polygon.vertices[i], polygon.vertices[i + 1]);
+
+    return fabsf(sum) > 1e-5f;
+}
+
 static relationship check_relationship(const polygon &polygon,
                                        const window &window) {
     int16_t x_min = window.begin.x, x_max = window.end.x - 1;
@@ -110,15 +109,15 @@ static relationship check_relationship(const polygon &polygon,
                : relationship::disjoint;
 }
 
-static void fill_pixel(const point2 &point, std::vector<polygon> &polygons,
+static void fill_pixel(const point2 &point, array<polygon> &polygons,
                        void set_pixel(point2, uint16_t)) {
-    uint16_t color = polygons[0].color;
-    float z_max = get_z(polygons[0], point);
-    for (int i = 1; i < polygons.size(); ++i) {
-        float z = get_z(polygons[i], point);
+    uint16_t color = polygons.data[0].color;
+    float z_max = get_z(polygons.data[0], point);
+    for (int i = 1; i < polygons.size; ++i) {
+        float z = get_z(polygons.data[i], point);
         if (z > z_max) {
             z_max = z;
-            color = polygons[i].color;
+            color = polygons.data[i].color;
         }
     }
 
@@ -135,7 +134,7 @@ void fill_window(const window &window, const uint16_t color,
 }
 
 void split_window(std::stack<window> &stack, const window &window,
-                  std::vector<polygon> &polygons) {
+                  array<polygon> &polygons) {
     int16_t x_split = window.begin.x + ((window.end.x - window.begin.x) / 2);
     int16_t y_split = window.begin.y + ((window.end.y - window.begin.y) / 2);
 
@@ -169,7 +168,7 @@ void split_window(std::stack<window> &stack, const window &window,
 }
 
 std::pair<bool, polygon> find_cover_polygon(const window &window,
-                                            std::vector<polygon> &polygons) {
+                                            array<polygon> &polygons) {
     auto window_end_x = static_cast<int16_t>(window.end.x - 1);
     auto window_end_y = static_cast<int16_t>(window.end.y - 1);
 
@@ -180,15 +179,14 @@ std::pair<bool, polygon> find_cover_polygon(const window &window,
 
     size_t polygon_indices[4] = {0};
     float z_max[4];
-
     for (uint32_t i = 0; i < 4; ++i)
-        z_max[i] = get_z(polygons[0], window_vertices[i]);
+        z_max[i] = get_z(polygons.data[0], window_vertices[i]);
 
-    for (uint32_t i = 1; i < polygons.size(); ++i) {
+    for (uint32_t i = 1; i < polygons.size; ++i) {
         float z[4];
 
         for (uint32_t j = 0; j < 4; ++j) {
-            z[j] = get_z(polygons[i], window_vertices[j]);
+            z[j] = get_z(polygons.data[i], window_vertices[j]);
 
             if (z[j] - z_max[j] > std::numeric_limits<float>::epsilon()) {
                 z_max[j] = z[j];
@@ -202,10 +200,8 @@ std::pair<bool, polygon> find_cover_polygon(const window &window,
             return {false, {}};
     }
 
-    return {true, polygons[polygon_indices[0]]};
+    return {true, polygons.data[polygon_indices[0]]};
 }
-
-static int counter;
 
 void warnock_render(const window &full_window, const uint16_t bg_color,
                     void set_pixel(point2, uint16_t)) {
@@ -213,36 +209,47 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
     stack.push(full_window);
 
     while (!stack.empty()) {
-        counter++;
         window current_window = stack.top();
         stack.pop();
 
-        std::vector<polygon> visible;
-        bool split_flag = false;
-        for (auto &polygon : current_window.polygons) {
+        size_t index = 0;
+        size_t disjoint_cursor = 0;
+        size_t surrounding_cursor = current_window.polygons.size;
+        while (index < surrounding_cursor) {
+            polygon polygon = current_window.polygons.data[index];
             relationship rel = check_relationship(polygon, current_window);
 
-            if (rel != relationship::disjoint)
-                visible.push_back(polygon);
-
-            if (rel == relationship::contained ||
-                rel == relationship::intersecting)
-                split_flag = true;
+            if (rel == relationship::disjoint) {
+                std::swap(current_window.polygons.data[index++],
+                          current_window.polygons.data[disjoint_cursor++]);
+            } else if (rel == relationship::surrounding) {
+                std::swap(current_window.polygons.data[index],
+                          current_window.polygons.data[--surrounding_cursor]);
+            } else {
+                ++index;
+            }
         }
+
+        array<polygon> visible = {current_window.polygons.data + disjoint_cursor,
+                                  current_window.polygons.size - disjoint_cursor};
 
         uint16_t window_width = current_window.end.x - current_window.begin.x;
         uint16_t window_height = current_window.end.y - current_window.begin.y;
 
+        if (surrounding_cursor != disjoint_cursor) {
+
+        }
+
         if (window_width == 1 && window_height == 1) {
-            if (visible.empty()) {
+            if (visible.size == 0) {
                 set_pixel(current_window.begin, bg_color);
             } else {
                 fill_pixel(current_window.begin, visible, set_pixel);
             }
-        } else if (split_flag) {
+        } else if (surrounding_cursor != disjoint_cursor) {
             split_window(stack, current_window, visible);
         } else {
-            if (visible.empty()) {
+            if (visible.size == 0) {
                 fill_window(current_window, bg_color, set_pixel);
                 continue;
             }
@@ -256,7 +263,4 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
             }
         }
     }
-
-    std::cout << "counter " << counter << std::endl;
-    counter = 0;
 }

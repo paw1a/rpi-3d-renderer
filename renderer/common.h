@@ -43,5 +43,5 @@ struct window {
     point2 begin;
     // bottom right corner
     point2 end;
-    std::vector<polygon> polygons;
+    array<polygon> polygons;
 };
