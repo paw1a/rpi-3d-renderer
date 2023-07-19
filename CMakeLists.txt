@@ -26,6 +26,7 @@ set(COMMON_SOURCES
 set(RPI_PICO_SOURCES
         src/main.cpp
         src/loader.cpp
+        src/hw_config.cpp
         )
 
 add_executable(rpi-pico ${COMMON_SOURCES} ${RPI_PICO_SOURCES})
@@ -45,4 +46,4 @@ target_link_libraries(rpi-pico PRIVATE
         fatfs_spi
         )
 
-add_subdirectory(desktop)
+#add_subdirectory(desktop)
