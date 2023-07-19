@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../loader/loader.h"
 #include "common.h"
 #include <iostream>
 

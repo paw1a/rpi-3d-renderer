@@ -14,18 +14,6 @@ struct line2 {
     point2 end;
 };
 
-struct face {
-    std::vector<size_t> vertex_indices;
-    size_t normal_index;
-    struct material material;
-};
-
-struct object {
-    std::vector<face> faces;
-    std::vector<m3::vec3> vertices;
-    std::vector<m3::vec3> normals;
-};
-
 struct polygon {
     std::vector<point2> vertices;
     uint16_t color;
@@ -43,5 +31,5 @@ struct window {
     point2 begin;
     // bottom right corner
     point2 end;
-    array<polygon> polygons;
+    array<polygon> polygons{};
 };

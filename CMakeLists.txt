@@ -24,14 +24,25 @@ set(COMMON_SOURCES
         )
 
 set(RPI_PICO_SOURCES
-        src/rpi-pico/main.cpp
-        src/desktop/loader.cpp
+        src/main.cpp
+        src/loader.cpp
         )
 
 add_executable(rpi-pico ${COMMON_SOURCES} ${RPI_PICO_SOURCES})
 
 pico_add_extra_outputs(rpi-pico)
 
-include_directories(src/math src/render src/loader src/rpi-pico)
+include_directories(src/math src/render src/scene)
 
-target_link_libraries(rpi-pico PRIVATE pico_stdlib pico_stdio ili934x hardware_gpio hardware_spi)
+add_subdirectory(lib/fatfs-spi build)
+
+target_link_libraries(rpi-pico PRIVATE
+        pico_stdlib
+        pico_stdio
+        ili934x
+        hardware_gpio
+        hardware_spi
+        fatfs_spi
+        )
+
+add_subdirectory(desktop)

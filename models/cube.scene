@@ -1,0 +1,15 @@
+# path to .obj file
+o cube.obj
+
+# path to .mtl file
+m cube.mtl
+
+# light positions
+l 1.0 1.0 1.0
+l -1.0 -1.0 -1.0
+l -1.0 -1.0 -1.0
+
+# camera position
+cp 0.0 0.0 10.0
+# camera target (look at)
+ct 0.0 0.0 0.0
