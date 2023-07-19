@@ -30,28 +30,20 @@ static void set_pixel(point2 point, uint16_t rgb565_color) {
 }
 
 int main() {
-    std::map<std::string, material> materials;
-    std::ifstream material_file("models/monkey.mtl", std::ios::in);
-    if (!load_materials(material_file, materials)) {
-        printf("failed to load materials\n");
+    scene scene;
+    std::string scene_path = "models/cube.scene";
+    std::ifstream ifs(scene_path, std::ios::in);
+    if (!ifs.is_open()) {
+        std::cout << "failed to open scene file " << scene_path << std::endl;
         return -1;
     }
 
-    std::vector<m3::vec3> lights = {
-        {1, 1, 1},
-        {-1, -1, -1},
-        {-1, -1, -1},
-    };
-
-    std::map<std::string, object> objects;
-    std::ifstream object_file("models/monkey.obj", std::ios::in);
-    if (!load_objects(object_file, materials, objects)) {
-        printf("failed to load objects\n");
+    if (!load_scene(ifs, scene)) {
+        std::cout << "failed to load scene " << scene_path << std::endl;
         return -1;
     }
 
-    for (auto const &[name, object] : objects) {
-        std::cout << name << std::endl;
+    for (auto const &object : scene.objects) {
         std::cout << object << std::endl;
     }
 
@@ -86,13 +78,12 @@ int main() {
     pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
 
     size_t polygons_size = 0;
-    for (auto &[name, object] : objects)
+    for (auto &object : scene.objects)
         polygons_size += object.faces.size();
 
     array<polygon> polygons = {new polygon[polygons_size], polygons_size};
+    std::cout << "polygons count = " << polygons_size << std::endl;
 
-    m3::vec3 camera_pos = {0, 0, 10};
-    m3::vec3 up = {0, 1, 0};
     float angle = 0;
 
     bool quit = false;
@@ -119,28 +110,31 @@ int main() {
 
         auto begin = std::chrono::steady_clock::now();
 
-        m3::mat4 camara_rotate =
-            m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
+        m3::mat4 camara_rotate = m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
         m3::mat4 scale = m3::scale({2000, 2000, 2000});
         m3::mat4 view =
-            m3::look_at(m3::transform_vector(camara_rotate, camera_pos),
-                        {0, 0, 0}, m3::transform_vector(camara_rotate, up));
+            m3::look_at(m3::transform_vector(camara_rotate, scene.camera.position),
+                        scene.camera.target, m3::transform_vector(camara_rotate, scene.camera.up));
         m3::mat4 perspective = m3::perspective(80, 1, 1.1f, 10.0f);
         m3::mat4 transform = scale * perspective * view;
 
-        std::map<std::string, object> temp_objects(objects);
-        for (auto &[name, object] : temp_objects) {
+        for (auto &object : scene.objects) {
             for (auto &vertice : object.vertices) {
                 vertice = m3::transform_vector(transform, vertice);
             }
         }
 
-        if (!preprocess_objects(temp_objects, lights, polygons)) {
+        if (!scene_to_polygons(scene, polygons)) {
             printf("failed to preprocess objects\n");
             return -1;
         }
 
-        std::cout << polygons_size << std::endl;
+        transform = m3::inverse(transform);
+        for (auto &object : scene.objects) {
+            for (auto &vertice : object.vertices) {
+                vertice = m3::transform_vector(transform, vertice);
+            }
+        }
 
         auto end = std::chrono::steady_clock::now();
         std::cout << "preprocess time = "

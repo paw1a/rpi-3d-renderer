@@ -1,10 +1,10 @@
 #pragma once
 
 #include "common.h"
+#include "object.h"
+#include "scene.h"
+
 #include <map>
 #include <vector>
 
-bool preprocess_objects(const std::map<std::string, object> &objects,
-                        const std::vector<m3::vec3> &lights,
-                        array<polygon> &polygons);
-void adjust_data_to_display(std::map<std::string, object> &objects);
+bool scene_to_polygons(const scene &scene, array<polygon> &polygons);

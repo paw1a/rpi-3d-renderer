@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "object.h"
 #include <iostream>
 
 std::ostream &operator<<(std::ostream &os, const point2 &point);

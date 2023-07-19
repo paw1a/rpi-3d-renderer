@@ -7,7 +7,7 @@
 struct face {
     std::vector<size_t> vertex_indices;
     size_t normal_index;
-    struct material material;
+    size_t material_index;
 };
 
 struct object {

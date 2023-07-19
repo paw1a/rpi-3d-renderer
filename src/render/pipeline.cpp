@@ -129,11 +129,9 @@ static uint16_t material_to_rgb565(const material &material,
     return material_color_to_rgb565(color);
 }
 
-bool preprocess_objects(const std::map<std::string, object> &objects,
-                        const std::vector<m3::vec3> &lights,
-                        array<polygon> &polygons) {
+bool scene_to_polygons(const scene &scene, array<polygon> &polygons) {
     size_t i = 0;
-    for (auto const &[name, object] : objects) {
+    for (auto const &object : scene.objects) {
         for (auto &face : object.faces) {
             std::vector<m3::vec3> vertices;
             for (auto &index : face.vertex_indices)
@@ -146,8 +144,9 @@ bool preprocess_objects(const std::map<std::string, object> &objects,
                 polygon.vertices.emplace_back(x, y);
             }
 
+            material material = scene.materials[face.material_index];
             polygon.color = material_to_rgb565(
-                face.material, lights, object.normals[face.normal_index]);
+                material, scene.lights, object.normals[face.normal_index]);
             compute_plane_equation(vertices, polygon);
             polygons.data[i++] = polygon;
         }
