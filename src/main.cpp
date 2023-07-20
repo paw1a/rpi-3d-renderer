@@ -2,18 +2,33 @@
 #include <vector>
 #include <sstream>
 
+#include "hardware/gpio.h"
 #include "pico/stdlib.h"
 #include "f_util.h"
 #include "ff.h"
 #include "rtc.h"
 #include "hw_config.h"
+#include "ili934x.h"
+
 #include "loader.h"
 #include "debug.h"
 #include "pipeline.h"
 #include "render.h"
 
-static void set_pixel(point2 point, uint16_t color) {
+#define SPI_PORT spi0
 
+#define PIN_MISO 4
+#define PIN_CS 5
+#define PIN_SCK 6
+#define PIN_MOSI 7
+#define PIN_DC 8
+#define PIN_RST 9
+
+static uint16_t *pixels;
+
+static void set_pixel(point2 point, uint16_t color) {
+    pixels[(point.y + SCREEN_HEIGHT / 2) * SCREEN_WIDTH +
+           (point.x + SCREEN_WIDTH / 2)] = color;
 }
 
 int main() {
@@ -76,6 +91,8 @@ int main() {
         }
     }
 
+    pixels = new uint16_t[SCREEN_WIDTH * SCREEN_HEIGHT];
+
     warnock_render({{-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2},
                     {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2},
                     polygons},
@@ -86,6 +103,24 @@ int main() {
     f_unmount(sd->pcName);
     std::cout << "Goodbye world" << std::endl;
 
-    for (;;)
-        ;
+    spi_init(SPI_PORT, 500 * 1000);
+    gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
+    gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
+    gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
+    gpio_init(PIN_CS);
+    gpio_set_dir(PIN_CS, GPIO_OUT);
+    gpio_init(PIN_DC);
+    gpio_set_dir(PIN_DC, GPIO_OUT);
+    gpio_init(PIN_RST);
+    gpio_set_dir(PIN_RST, GPIO_OUT);
+
+    auto *display = new ILI934X(SPI_PORT, PIN_CS, PIN_DC, PIN_RST);
+    display->reset();
+    display->init();
+
+    display->setRotation(R270DEG);
+    for (;;) {
+        display->clear();
+        display->blit(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
+    }
 }

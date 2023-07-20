@@ -47,3 +47,4 @@ target_link_libraries(rpi-pico PRIVATE
         )
 
 #add_subdirectory(desktop)
+#add_subdirectory(lib/ili9341)

@@ -2,3 +2,7 @@ https://www.tjhsst.edu/~dhyatt/supercomp/n310.html
 https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
 https://astikanand.github.io/techblogs/algorithms/geometric-algorithms
 https://github.com/carlk3/no-OS-FatFS-SD-SPI-RPi-Pico
+https://ogldev.org/www/tutorial12/tutorial12.html
+https://github.com/Noluye/Math3D/
+https://learnopengl.com/Getting-started/Coordinate-Systems
+http://paulbourke.net/dataformats/mtl/
