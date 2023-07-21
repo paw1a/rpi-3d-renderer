@@ -2,12 +2,12 @@
 #include <sstream>
 #include <vector>
 
-#include "ili9341.h"
-#include "gfx.h"
 #include "f_util.h"
 #include "ff.h"
+#include "gfx.h"
 #include "hardware/spi.h"
 #include "hw_config.h"
+#include "ili9341.h"
 #include "pico/stdlib.h"
 #include "rtc.h"
 
@@ -26,7 +26,8 @@
 #define PIN_RST 9
 
 static void set_pixel(point2 point, uint16_t color) {
-    GFX_drawPixel(point.x + SCREEN_WIDTH / 2, point.y + SCREEN_HEIGHT / 2, color);
+    GFX_drawPixel(point.x + SCREEN_WIDTH / 2, point.y + SCREEN_HEIGHT / 2,
+                  color);
 }
 
 int main() {
@@ -78,12 +79,12 @@ int main() {
         GFX_clearScreen();
 
         m3::mat4 camara_rotate =
-                m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
+            m3::rotate_y(m3::deg2rad(angle)) * m3::rotate_x(m3::deg2rad(angle));
         m3::mat4 scale = m3::scale({2000, 2000, 2000});
-        m3::mat4 view =
-                m3::look_at(m3::transform_vector(camara_rotate, scene.camera.position),
-                            scene.camera.target,
-                            m3::transform_vector(camara_rotate, scene.camera.up));
+        m3::mat4 view = m3::look_at(
+            m3::transform_vector(camara_rotate, scene.camera.position),
+            scene.camera.target,
+            m3::transform_vector(camara_rotate, scene.camera.up));
         m3::mat4 perspective = m3::perspective(80, 1, 1.1f, 10.0f);
         m3::mat4 transform = scale * perspective * view;
 

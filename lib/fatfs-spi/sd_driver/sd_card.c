@@ -165,7 +165,7 @@ specific language governing permissions and limitations under the License.
 //
 #include "pico/mutex.h"
 //
-#include "hw_config.h"  // Hardware Configuration of the SPI and SD Card "objects"
+#include "hw_config.h" // Hardware Configuration of the SPI and SD Card "objects"
 #include "my_debug.h"
 #include "sd_spi.h"
 //
@@ -173,7 +173,7 @@ specific language governing permissions and limitations under the License.
 //
 #include "ff.h" /* Obtains integer types */
 //
-#include "diskio.h" /* Declarations of disk functions */  // Needed for STA_NOINIT, ...
+#include "diskio.h" /* Declarations of disk functions */ // Needed for STA_NOINIT, ...
 
 #ifndef SD_CRC_ENABLED
 #define SD_CRC_ENABLED 1
@@ -204,8 +204,8 @@ static bool crc_on = true;
 #define SPI_DATA_ACCEPTED (0x05)
 #define SPI_DATA_CRC_ERROR (0x0B)
 #define SPI_DATA_WRITE_ERROR (0x0D)
-#define SPI_START_BLOCK \
-    (0xFE)                             /*!< For Single Block Read/Write and Multiple Block Read */
+#define SPI_START_BLOCK                                                        \
+    (0xFE) /*!< For Single Block Read/Write and Multiple Block Read */
 #define SPI_START_BLK_MUL_WRITE (0xFC) /*!< Start Multi-block write */
 #define SPI_STOP_TRAN (0xFD)           /*!< Stop Multi-block write */
 
@@ -229,7 +229,8 @@ static bool crc_on = true;
 
 // Only HC block size is supported. Making this a static constant reduces code
 // size.
-#define BLOCK_SIZE_HC 512 /*!< Block size supported for SD card is 512 bytes */
+#define BLOCK_SIZE_HC 512 /*!< Block size supported for SD card is 512 bytes   \
+                           */
 static const uint32_t _block_size = BLOCK_SIZE_HC;
 
 /* R1 Response Format */
@@ -245,20 +246,20 @@ static const uint32_t _block_size = BLOCK_SIZE_HC;
 
 // Supported SD Card Commands
 typedef enum {
-    CMD_NOT_SUPPORTED = -1,             /**< Command not supported error */
-    CMD0_GO_IDLE_STATE = 0,             /**< Resets the SD Memory Card */
-    CMD1_SEND_OP_COND = 1,              /**< Sends host capacity support */
-    CMD6_SWITCH_FUNC = 6,               /**< Check and Switches card function */
-    CMD8_SEND_IF_COND = 8,              /**< Supply voltage info */
-    CMD9_SEND_CSD = 9,                  /**< Provides Card Specific data */
-    CMD10_SEND_CID = 10,                /**< Provides Card Identification */
-    CMD12_STOP_TRANSMISSION = 12,       /**< Forces the card to stop transmission */
-    CMD13_SEND_STATUS = 13,             /**< Card responds with status */
-    CMD16_SET_BLOCKLEN = 16,            /**< Length for SC card is set */
-    CMD17_READ_SINGLE_BLOCK = 17,       /**< Read single block of data */
-    CMD18_READ_MULTIPLE_BLOCK = 18,     /**< Card transfers data blocks to host
-         until interrupted by a STOP_TRANSMISSION command */
-    CMD24_WRITE_BLOCK = 24,             /**< Write single block of data */
+    CMD_NOT_SUPPORTED = -1,         /**< Command not supported error */
+    CMD0_GO_IDLE_STATE = 0,         /**< Resets the SD Memory Card */
+    CMD1_SEND_OP_COND = 1,          /**< Sends host capacity support */
+    CMD6_SWITCH_FUNC = 6,           /**< Check and Switches card function */
+    CMD8_SEND_IF_COND = 8,          /**< Supply voltage info */
+    CMD9_SEND_CSD = 9,              /**< Provides Card Specific data */
+    CMD10_SEND_CID = 10,            /**< Provides Card Identification */
+    CMD12_STOP_TRANSMISSION = 12,   /**< Forces the card to stop transmission */
+    CMD13_SEND_STATUS = 13,         /**< Card responds with status */
+    CMD16_SET_BLOCKLEN = 16,        /**< Length for SC card is set */
+    CMD17_READ_SINGLE_BLOCK = 17,   /**< Read single block of data */
+    CMD18_READ_MULTIPLE_BLOCK = 18, /**< Card transfers data blocks to host
+     until interrupted by a STOP_TRANSMISSION command */
+    CMD24_WRITE_BLOCK = 24,         /**< Write single block of data */
     CMD25_WRITE_MULTIPLE_BLOCK = 25,    /**< Continuously writes blocks of data
         until    'Stop Tran' token is sent */
     CMD27_PROGRAM_CSD = 27,             /**< Programming bits of CSD */
@@ -266,11 +267,11 @@ typedef enum {
      block to be erased. */
     CMD33_ERASE_WR_BLK_END_ADDR = 33,   /**< Sets the address of the last write
        block of the continuous range to be erased.*/
-    CMD38_ERASE = 38,                   /**< Erases all previously selected write blocks */
-    CMD55_APP_CMD = 55,                 /**< Extend to Applications specific commands */
-    CMD56_GEN_CMD = 56,                 /**< General Purpose Command */
-    CMD58_READ_OCR = 58,                /**< Read OCR register of card */
-    CMD59_CRC_ON_OFF = 59,              /**< Turns the CRC option on or off*/
+    CMD38_ERASE = 38,      /**< Erases all previously selected write blocks */
+    CMD55_APP_CMD = 55,    /**< Extend to Applications specific commands */
+    CMD56_GEN_CMD = 56,    /**< General Purpose Command */
+    CMD58_READ_OCR = 58,   /**< Read OCR register of card */
+    CMD59_CRC_ON_OFF = 59, /**< Turns the CRC option on or off*/
     // App Commands
     ACMD6_SET_BUS_WIDTH = 6,
     ACMD13_SD_STATUS = 13,
@@ -314,15 +315,15 @@ static uint8_t sd_cmd_spi(sd_card_t *pSD, cmdSupported cmd, uint32_t arg) {
         // CMD0 is executed in SD mode, hence should have correct CRC
         // CMD8 CRC verification is always enabled
         switch (cmd) {
-            case CMD0_GO_IDLE_STATE:
-                cmdPacket[5] = 0x95;
-                break;
-            case CMD8_SEND_IF_COND:
-                cmdPacket[5] = 0x87;
-                break;
-            default:
-                cmdPacket[5] = 0xFF;  // Make sure bit 0-End bit is high
-                break;
+        case CMD0_GO_IDLE_STATE:
+            cmdPacket[5] = 0x95;
+            break;
+        case CMD8_SEND_IF_COND:
+            cmdPacket[5] = 0x87;
+            break;
+        default:
+            cmdPacket[5] = 0xFF; // Make sure bit 0-End bit is high
+            break;
         }
     }
     // send a command
@@ -357,7 +358,8 @@ static bool sd_wait_ready(sd_card_t *pSD, int timeout) {
     } while (resp == 0x00 &&
              0 < absolute_time_diff_us(get_absolute_time(), timeout_time));
 
-    if (resp == 0x00) DBG_PRINTF("%s failed\r\n", __FUNCTION__);
+    if (resp == 0x00)
+        DBG_PRINTF("%s failed\r\n", __FUNCTION__);
 
     // Return success/failure
     return (resp > 0x00);
@@ -488,11 +490,12 @@ static int sd_cmd(sd_card_t *pSD, const cmdSupported cmd, uint32_t arg,
     if (R1_NO_RESPONSE == response) {
         DBG_PRINTF("No response CMD:%d response: 0x%" PRIx32 "\r\n", cmd,
                    response);
-        return SD_BLOCK_DEVICE_ERROR_NO_DEVICE;  // No device
+        return SD_BLOCK_DEVICE_ERROR_NO_DEVICE; // No device
     }
     if (response & R1_COM_CRC_ERROR && ACMD23_SET_WR_BLK_ERASE_COUNT != cmd) {
-        DBG_PRINTF("CRC error CMD:%d response 0x%" PRIx32 "\r\n", cmd, response);
-        return SD_BLOCK_DEVICE_ERROR_CRC;  // CRC error
+        DBG_PRINTF("CRC error CMD:%d response 0x%" PRIx32 "\r\n", cmd,
+                   response);
+        return SD_BLOCK_DEVICE_ERROR_CRC; // CRC error
     }
     if (response & R1_ILLEGAL_COMMAND) {
         if (ACMD23_SET_WR_BLK_ERASE_COUNT != cmd)
@@ -502,14 +505,14 @@ static int sd_cmd(sd_card_t *pSD, const cmdSupported cmd, uint32_t arg,
             // Illegal command is for Ver1 or not SD Card
             pSD->card_type = CARD_UNKNOWN;
         }
-        return SD_BLOCK_DEVICE_ERROR_UNSUPPORTED;  // Command not supported
+        return SD_BLOCK_DEVICE_ERROR_UNSUPPORTED; // Command not supported
     }
 
     //	DBG_PRINTF("CMD:%d \t arg:0x%" PRIx32 " \t Response:0x%" PRIx32 "\r\n",
     // cmd, arg, response);
     // Set status for other errors
     if ((response & R1_ERASE_RESET) || (response & R1_ERASE_SEQUENCE_ERROR)) {
-        status = SD_BLOCK_DEVICE_ERROR_ERASE;  // Erase error
+        status = SD_BLOCK_DEVICE_ERROR_ERASE; // Erase error
     } else if ((response & R1_ADDRESS_ERROR) ||
                (response & R1_PARAMETER_ERROR)) {
         // Misaligned address / invalid address block length
@@ -518,90 +521,90 @@ static int sd_cmd(sd_card_t *pSD, const cmdSupported cmd, uint32_t arg,
 
     // Get rest of the response part for other commands
     switch (cmd) {
-        case CMD8_SEND_IF_COND:  // Response R7
-            DBG_PRINTF("V2-Version Card\r\n");
-            pSD->card_type = SDCARD_V2;  // fallthrough
-            // Note: No break here, need to read rest of the response
-        case CMD58_READ_OCR:  // Response R3
-            response = (sd_spi_write(pSD, SPI_FILL_CHAR) << 24);
-            response |= (sd_spi_write(pSD, SPI_FILL_CHAR) << 16);
-            response |= (sd_spi_write(pSD, SPI_FILL_CHAR) << 8);
-            response |= sd_spi_write(pSD, SPI_FILL_CHAR);
-            DBG_PRINTF("R3/R7: 0x%" PRIx32 "\r\n", response);
-            break;
-        case CMD12_STOP_TRANSMISSION:  // Response R1b
-        case CMD38_ERASE:
-            sd_wait_ready(pSD, SD_COMMAND_TIMEOUT);
-            break;
-        case CMD13_SEND_STATUS:  // Response R2
-            response <<= 8;
-            response |= sd_spi_write(pSD, SPI_FILL_CHAR);
-            if (response) {
-                DBG_PRINTF("R2: 0x%" PRIx32 "\r\n", response);
-                if (response & 0x01 << 0) {
-                    DBG_PRINTF("Card is Locked                         \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_WRITE;
-                }
-                if (response & 0x01 << 1) {
-                    DBG_PRINTF("WP Erase Skip, Lock/Unlock Cmd Failed  \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_WRITE_PROTECTED;
-                }
-                if (response & 0x01 << 2) {
-                    DBG_PRINTF("Error                                  \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_WRITE;
-                }
-                if (response & 0x01 << 3) {
-                    DBG_PRINTF("CC Error                               \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_WRITE;
-                }
-                if (response & 0x01 << 4) {
-                    DBG_PRINTF("Card ECC Failed                        \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_WRITE;
-                }
-                if (response & 0x01 << 5) {
-                    DBG_PRINTF("WP Violation                           \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_WRITE_PROTECTED;
-                }
-                if (response & 0x01 << 6) {
-                    DBG_PRINTF("Erase Param                            \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_ERASE;
-                }
-                if (response & 0x01 << 7) {
-                    DBG_PRINTF("Out of Range, CSD_Overwrite            \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_PARAMETER;
-                }
-                if (response & 0x01 << 8) {
-                    DBG_PRINTF("In Idle State                          \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_NONE;
-                }
-                if (response & 0x01 << 9) {
-                    DBG_PRINTF("Erase Reset                            \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_ERASE;
-                }
-                if (response & 0x01 << 10) {
-                    DBG_PRINTF("Illegal Command                        \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_UNSUPPORTED;
-                }
-                if (response & 0x01 << 11) {
-                    DBG_PRINTF("Com CRC Error                          \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_CRC;
-                }
-                if (response & 0x01 << 12) {
-                    DBG_PRINTF("Erase Sequence Error                   \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_ERASE;
-                }
-                if (response & 0x01 << 13) {
-                    DBG_PRINTF("Address Error                          \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_PARAMETER;
-                }
-                if (response & 0x01 << 14) {
-                    DBG_PRINTF("Parameter Error                        \r\n");
-                    status = SD_BLOCK_DEVICE_ERROR_PARAMETER;
-                }
-                break;
+    case CMD8_SEND_IF_COND: // Response R7
+        DBG_PRINTF("V2-Version Card\r\n");
+        pSD->card_type = SDCARD_V2; // fallthrough
+        // Note: No break here, need to read rest of the response
+    case CMD58_READ_OCR: // Response R3
+        response = (sd_spi_write(pSD, SPI_FILL_CHAR) << 24);
+        response |= (sd_spi_write(pSD, SPI_FILL_CHAR) << 16);
+        response |= (sd_spi_write(pSD, SPI_FILL_CHAR) << 8);
+        response |= sd_spi_write(pSD, SPI_FILL_CHAR);
+        DBG_PRINTF("R3/R7: 0x%" PRIx32 "\r\n", response);
+        break;
+    case CMD12_STOP_TRANSMISSION: // Response R1b
+    case CMD38_ERASE:
+        sd_wait_ready(pSD, SD_COMMAND_TIMEOUT);
+        break;
+    case CMD13_SEND_STATUS: // Response R2
+        response <<= 8;
+        response |= sd_spi_write(pSD, SPI_FILL_CHAR);
+        if (response) {
+            DBG_PRINTF("R2: 0x%" PRIx32 "\r\n", response);
+            if (response & 0x01 << 0) {
+                DBG_PRINTF("Card is Locked                         \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_WRITE;
             }
-        default:  // Response R1
+            if (response & 0x01 << 1) {
+                DBG_PRINTF("WP Erase Skip, Lock/Unlock Cmd Failed  \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_WRITE_PROTECTED;
+            }
+            if (response & 0x01 << 2) {
+                DBG_PRINTF("Error                                  \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_WRITE;
+            }
+            if (response & 0x01 << 3) {
+                DBG_PRINTF("CC Error                               \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_WRITE;
+            }
+            if (response & 0x01 << 4) {
+                DBG_PRINTF("Card ECC Failed                        \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_WRITE;
+            }
+            if (response & 0x01 << 5) {
+                DBG_PRINTF("WP Violation                           \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_WRITE_PROTECTED;
+            }
+            if (response & 0x01 << 6) {
+                DBG_PRINTF("Erase Param                            \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_ERASE;
+            }
+            if (response & 0x01 << 7) {
+                DBG_PRINTF("Out of Range, CSD_Overwrite            \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_PARAMETER;
+            }
+            if (response & 0x01 << 8) {
+                DBG_PRINTF("In Idle State                          \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_NONE;
+            }
+            if (response & 0x01 << 9) {
+                DBG_PRINTF("Erase Reset                            \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_ERASE;
+            }
+            if (response & 0x01 << 10) {
+                DBG_PRINTF("Illegal Command                        \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_UNSUPPORTED;
+            }
+            if (response & 0x01 << 11) {
+                DBG_PRINTF("Com CRC Error                          \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_CRC;
+            }
+            if (response & 0x01 << 12) {
+                DBG_PRINTF("Erase Sequence Error                   \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_ERASE;
+            }
+            if (response & 0x01 << 13) {
+                DBG_PRINTF("Address Error                          \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_PARAMETER;
+            }
+            if (response & 0x01 << 14) {
+                DBG_PRINTF("Parameter Error                        \r\n");
+                status = SD_BLOCK_DEVICE_ERROR_PARAMETER;
+            }
             break;
+        }
+    default: // Response R1
+        break;
     }
     // Pass the updated response to the command
     if (NULL != resp) {
@@ -659,11 +662,11 @@ static uint32_t sd_go_idle_state(sd_card_t *pSD) {
 #define CMD8_PATTERN (0xAA)
 
 static int sd_cmd8(sd_card_t *pSD) {
-    uint32_t arg = (CMD8_PATTERN << 0);  // [7:0]check pattern
+    uint32_t arg = (CMD8_PATTERN << 0); // [7:0]check pattern
     uint32_t response = 0;
     int32_t status = SD_BLOCK_DEVICE_ERROR_NONE;
 
-    arg |= (0x1 << 8);  // 2.7-3.6V             // [11:8]supply voltage(VHS)
+    arg |= (0x1 << 8); // 2.7-3.6V             // [11:8]supply voltage(VHS)
 
     status = sd_cmd(pSD, CMD8_SEND_IF_COND, arg, false, &response);
     // Verify voltage and pattern for V2 version of card
@@ -715,39 +718,37 @@ static uint64_t sd_sectors_nolock(sd_card_t *pSD) {
     // csd_structure : csd[127:126]
     int csd_structure = ext_bits(csd, 127, 126);
     switch (csd_structure) {
-        case 0:
-            c_size = ext_bits(csd, 73, 62);       // c_size        : csd[73:62]
-            c_size_mult = ext_bits(csd, 49, 47);  // c_size_mult   : csd[49:47]
-            read_bl_len =
-                ext_bits(csd, 83, 80);     // read_bl_len   : csd[83:80] - the
-                                           // *maximum* read block length
-            block_len = 1 << read_bl_len;  // BLOCK_LEN = 2^READ_BL_LEN
-            mult = 1 << (c_size_mult +
-                         2);                // MULT = 2^C_SIZE_MULT+2 (C_SIZE_MULT < 8)
-            blocknr = (c_size + 1) * mult;  // BLOCKNR = (C_SIZE+1) * MULT
-            capacity = (uint64_t)blocknr *
-                       block_len;  // memory capacity = BLOCKNR * BLOCK_LEN
-            blocks = capacity / _block_size;
-            DBG_PRINTF("Standard Capacity: c_size: %" PRIu32 "\r\n", c_size);
-            DBG_PRINTF("Sectors: 0x%llx : %llu\r\n", blocks, blocks);
-            DBG_PRINTF("Capacity: 0x%llx : %llu MB\r\n", capacity,
-                       (capacity / (1024U * 1024U)));
-            break;
+    case 0:
+        c_size = ext_bits(csd, 73, 62);      // c_size        : csd[73:62]
+        c_size_mult = ext_bits(csd, 49, 47); // c_size_mult   : csd[49:47]
+        read_bl_len = ext_bits(csd, 83, 80); // read_bl_len   : csd[83:80] - the
+                                             // *maximum* read block length
+        block_len = 1 << read_bl_len;        // BLOCK_LEN = 2^READ_BL_LEN
+        mult =
+            1 << (c_size_mult + 2); // MULT = 2^C_SIZE_MULT+2 (C_SIZE_MULT < 8)
+        blocknr = (c_size + 1) * mult; // BLOCKNR = (C_SIZE+1) * MULT
+        capacity = (uint64_t)blocknr *
+                   block_len; // memory capacity = BLOCKNR * BLOCK_LEN
+        blocks = capacity / _block_size;
+        DBG_PRINTF("Standard Capacity: c_size: %" PRIu32 "\r\n", c_size);
+        DBG_PRINTF("Sectors: 0x%llx : %llu\r\n", blocks, blocks);
+        DBG_PRINTF("Capacity: 0x%llx : %llu MB\r\n", capacity,
+                   (capacity / (1024U * 1024U)));
+        break;
 
-        case 1:
-            hc_c_size =
-                ext_bits(csd, 69, 48);       // device size : C_SIZE : [69:48]
-            blocks = (hc_c_size + 1) << 10;  // block count = C_SIZE+1) * 1K
-                                             // byte (512B is block size)
-            DBG_PRINTF("SDHC/SDXC Card: hc_c_size: %" PRIu32 "\r\n", hc_c_size);
-            DBG_PRINTF("Sectors: %8llu\r\n", blocks);
-            DBG_PRINTF("Capacity: %8llu MB\r\n", (blocks / (2048U)));
-            break;
+    case 1:
+        hc_c_size = ext_bits(csd, 69, 48); // device size : C_SIZE : [69:48]
+        blocks = (hc_c_size + 1) << 10;    // block count = C_SIZE+1) * 1K
+                                           // byte (512B is block size)
+        DBG_PRINTF("SDHC/SDXC Card: hc_c_size: %" PRIu32 "\r\n", hc_c_size);
+        DBG_PRINTF("Sectors: %8llu\r\n", blocks);
+        DBG_PRINTF("Capacity: %8llu MB\r\n", (blocks / (2048U)));
+        break;
 
-        default:
-            DBG_PRINTF("CSD struct unsupported\r\n");
-            myASSERT(!"CSD struct unsupported\r\n");
-            return 0;
+    default:
+        DBG_PRINTF("CSD struct unsupported\r\n");
+        myASSERT(!"CSD struct unsupported\r\n");
+        return 0;
     };
     return blocks;
 }
@@ -762,7 +763,7 @@ uint64_t sd_sectors(sd_card_t *pSD) {
 static bool sd_wait_token(sd_card_t *pSD, uint8_t token) {
     TRACE_PRINTF("%s(0x%02hhx)\r\n", __FUNCTION__, token);
 
-    const uint32_t timeout = SD_COMMAND_TIMEOUT;  // Wait for start token
+    const uint32_t timeout = SD_COMMAND_TIMEOUT; // Wait for start token
     absolute_time_t timeout_time = make_timeout_time_ms(timeout);
     do {
         if (token == sd_spi_write(pSD, SPI_FILL_CHAR)) {
@@ -773,7 +774,7 @@ static bool sd_wait_token(sd_card_t *pSD, uint8_t token) {
     return false;
 }
 
-#define SPI_START_BLOCK \
+#define SPI_START_BLOCK                                                        \
     (0xFE) /*!< For Single Block Read/Write and Multiple Block Read */
 
 static int sd_read_bytes(sd_card_t *pSD, uint8_t *buffer, uint32_t length) {
@@ -987,19 +988,21 @@ static int in_sd_write_blocks(sd_card_t *pSD, const uint8_t *buffer,
 
         // Multiple block write command
         if (SD_BLOCK_DEVICE_ERROR_NONE !=
-            (status = sd_cmd(pSD, CMD25_WRITE_MULTIPLE_BLOCK, addr, false, 0))) {
+            (status =
+                 sd_cmd(pSD, CMD25_WRITE_MULTIPLE_BLOCK, addr, false, 0))) {
             return status;
         }
         // Write the data: one block at a time
         do {
-            response = sd_write_block(pSD, buffer, SPI_START_BLK_MUL_WRITE, _block_size);
+            response = sd_write_block(pSD, buffer, SPI_START_BLK_MUL_WRITE,
+                                      _block_size);
             if (response != SPI_DATA_ACCEPTED) {
                 DBG_PRINTF("Multiple Block Write failed: 0x%x\r\n", response);
                 status = SD_BLOCK_DEVICE_ERROR_WRITE;
                 break;
             }
             buffer += _block_size;
-        } while (--blockCnt);  // Send all blocks of data
+        } while (--blockCnt); // Send all blocks of data
         /* In a Multiple Block write operation, the stop transmission will be
          * done by sending 'Stop Tran' token instead of 'Start Block' token at
          * the beginning of the next block
@@ -1041,7 +1044,8 @@ static int sd_init_medium(sd_card_t *pSD) {
     // The card is transitioned from SDCard mode to SPI mode by sending the CMD0
     // + CS Asserted("0")
     if (sd_go_idle_state(pSD) != R1_IDLE_STATE) {
-        DBG_PRINTF("No disk, or could not put SD card in to SPI idle state\r\n");
+        DBG_PRINTF(
+            "No disk, or could not put SD card in to SPI idle state\r\n");
         return SD_BLOCK_DEVICE_ERROR_NO_DEVICE;
     }
 
@@ -1107,8 +1111,8 @@ static int sd_init_medium(sd_card_t *pSD) {
                 pSD->card_type = SDCARD_V2HC;
                 DBG_PRINTF("Card Initialized: High Capacity Card\r\n");
             } else {
-                DBG_PRINTF(
-                    "Card Initialized: Standard Capacity Card: Version 2.x\r\n");
+                DBG_PRINTF("Card Initialized: Standard Capacity Card: Version "
+                           "2.x\r\n");
             }
         }
     } else {
@@ -1152,14 +1156,16 @@ bool sd_init_driver() {
                 gpio_set_dir(pSD->card_detect_gpio, GPIO_IN);
             }
             if (pSD->set_drive_strength) {
-                gpio_set_drive_strength(pSD->ss_gpio, pSD->ss_gpio_drive_strength);
+                gpio_set_drive_strength(pSD->ss_gpio,
+                                        pSD->ss_gpio_drive_strength);
             }
             // Chip select is active-low, so we'll initialise it to a
             // driven-high state.
-            gpio_put(pSD->ss_gpio, 1);  // Avoid any glitches when enabling output
+            gpio_put(pSD->ss_gpio,
+                     1); // Avoid any glitches when enabling output
             gpio_init(pSD->ss_gpio);
             gpio_set_dir(pSD->ss_gpio, GPIO_OUT);
-            gpio_put(pSD->ss_gpio, 1);  // In case set_dir does anything
+            gpio_put(pSD->ss_gpio, 1); // In case set_dir does anything
         }
         for (size_t i = 0; i < spi_get_num(); ++i) {
             spi_t *pSPI = spi_get_by_num(i);
@@ -1180,7 +1186,8 @@ static int sd_init(sd_card_t *pSD) {
     //	STA_NODISK = 0x02, /* No medium in the drive */
     //	STA_PROTECT = 0x04 /* Write protected */
 
-    if (!mutex_is_initialized(&pSD->mutex)) mutex_init(&pSD->mutex);
+    if (!mutex_is_initialized(&pSD->mutex))
+        mutex_init(&pSD->mutex);
     sd_lock(pSD);
 
     // Make sure there's a card in the socket before proceeding

@@ -74,9 +74,10 @@ struct sd_card_t {
     -5005 /*!< device is missing or not connected */
 #define SD_BLOCK_DEVICE_ERROR_WRITE_PROTECTED -5006 /*!< write protected */
 #define SD_BLOCK_DEVICE_ERROR_UNUSABLE -5007        /*!< unusable card */
-#define SD_BLOCK_DEVICE_ERROR_NO_RESPONSE -5008 /*!< No response from device   \
-                                                 */
-#define SD_BLOCK_DEVICE_ERROR_CRC -5009         /*!< CRC error */
+#define SD_BLOCK_DEVICE_ERROR_NO_RESPONSE                                      \
+    -5008                                 /*!< No response from device         \
+                                           */
+#define SD_BLOCK_DEVICE_ERROR_CRC -5009   /*!< CRC error */
 #define SD_BLOCK_DEVICE_ERROR_ERASE -5010 /*!< Erase error: reset/sequence */
 #define SD_BLOCK_DEVICE_ERROR_WRITE                                            \
     -5011 /*!< SPI Write error: !SPI_DATA_ACCEPTED */

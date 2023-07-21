@@ -138,11 +138,12 @@ int main() {
         }
 
         auto end = std::chrono::steady_clock::now();
-//        std::cout << "preprocess time = "
-//                  << std::chrono::duration_cast<std::chrono::microseconds>(
-//                         end - begin)
-//                         .count()
-//                  << std::endl;
+        //        std::cout << "preprocess time = "
+        //                  <<
+        //                  std::chrono::duration_cast<std::chrono::microseconds>(
+        //                         end - begin)
+        //                         .count()
+        //                  << std::endl;
 
         begin = std::chrono::steady_clock::now();
         warnock_render({{-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2},
@@ -151,11 +152,12 @@ int main() {
                        BLACK, set_pixel);
 
         end = std::chrono::steady_clock::now();
-//        std::cout << "render time = "
-//                  << std::chrono::duration_cast<std::chrono::microseconds>(
-//                         end - begin)
-//                         .count()
-//                  << std::endl;
+        //        std::cout << "render time = "
+        //                  <<
+        //                  std::chrono::duration_cast<std::chrono::microseconds>(
+        //                         end - begin)
+        //                         .count()
+        //                  << std::endl;
 
         SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);

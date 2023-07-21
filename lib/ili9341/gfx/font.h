@@ -118,6 +118,4 @@ static const unsigned char font[] = {
     0x3C, 0x00, 0x00, 0x00, 0x00, 0x00 // #255 NBSP
 };
 
-
-
 #endif // FONT_H

@@ -150,7 +150,7 @@ typedef struct {
     DWORD cdc_scl; /* Containing directory start cluster (invalid when cdir is
                       0) */
     DWORD
-        cdc_size; /* b31-b8:Size of containing directory, b7-b0: Chain status */
+    cdc_size; /* b31-b8:Size of containing directory, b7-b0: Chain status */
     DWORD cdc_ofs; /* Offset in the containing directory (invalid when cdir is
                       0) */
 #endif
@@ -179,14 +179,14 @@ typedef struct {
     BYTE stat; /* Object chain status (b1-0: =0:not contiguous, =2:contiguous,
                   =3:fragmented in this session, b2:sub-directory stretched) */
     DWORD
-        sclust; /* Object data start cluster (0:no cluster or root directory) */
+    sclust; /* Object data start cluster (0:no cluster or root directory) */
     FSIZE_t objsize; /* Object size (valid when sclust != 0) */
 #if FF_FS_EXFAT
     DWORD n_cont; /* Size of first fragment - 1 (valid when stat == 3) */
     DWORD n_frag; /* Size of last fragment needs to be written to FAT (valid
                      when not zero) */
     DWORD
-        c_scl; /* Containing directory start cluster (valid when sclust != 0) */
+    c_scl; /* Containing directory start cluster (valid when sclust != 0) */
     DWORD c_size; /* b31-b8:Size of containing directory, b7-b0: Chain status
                      (valid when c_scl != 0) */
     DWORD c_ofs;  /* Offset in the containing directory (valid when file object

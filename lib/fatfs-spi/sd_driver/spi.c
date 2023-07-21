@@ -14,12 +14,12 @@ specific language governing permissions and limitations under the License.
 
 #include <stdbool.h>
 //
-#include "pico/stdlib.h"
 #include "pico/mutex.h"
 #include "pico/sem.h"
+#include "pico/stdlib.h"
 //
-#include "my_debug.h"
 #include "hw_config.h"
+#include "my_debug.h"
 //
 #include "spi.h"
 
@@ -28,7 +28,7 @@ static bool irqShared = true;
 
 static spi_t *spi_get_by_rx_dma(const uint rx_dma) {
     for (size_t i = 0; i < spi_get_num(); ++i)
-        if (spi_get_by_num(i)->rx_dma == rx_dma) 
+        if (spi_get_by_num(i)->rx_dma == rx_dma)
             return spi_get_by_num(i);
     return NULL;
 }
@@ -40,10 +40,10 @@ static void __not_in_flash_func(spi_irq_handler)() {
     else
         dma_hw_ints_p = &dma_hw->ints0;
     for (size_t ch = 0; ch < NUM_DMA_CHANNELS; ++ch) {
-        if (*dma_hw_ints_p & (1 << ch)) {  // Is channel requesting interrupt?
+        if (*dma_hw_ints_p & (1 << ch)) { // Is channel requesting interrupt?
             spi_t *spi_p = spi_get_by_rx_dma(ch);
-            if (spi_p) {                    // Ours?
-                *dma_hw_ints_p = 1u << ch;  // Clear it.
+            if (spi_p) {                   // Ours?
+                *dma_hw_ints_p = 1u << ch; // Clear it.
                 myASSERT(!dma_channel_is_busy(spi_p->rx_dma));
                 sem_release(&spi_p->sem);
             }
@@ -87,17 +87,17 @@ bool spi_transfer(spi_t *pSPI, const uint8_t *tx, uint8_t *rx, size_t length) {
     dma_hw->ints0 = 1u << pSPI->rx_dma;
 
     dma_channel_configure(pSPI->tx_dma, &pSPI->tx_dma_cfg,
-                          &spi_get_hw(pSPI->hw_inst)->dr,  // write address
-                          tx,                              // read address
-                          length,  // element count (each element is of
-                                   // size transfer_data_size)
-                          false);  // start
+                          &spi_get_hw(pSPI->hw_inst)->dr, // write address
+                          tx,                             // read address
+                          length, // element count (each element is of
+                                  // size transfer_data_size)
+                          false); // start
     dma_channel_configure(pSPI->rx_dma, &pSPI->rx_dma_cfg,
-                          rx,                              // write address
-                          &spi_get_hw(pSPI->hw_inst)->dr,  // read address
-                          length,  // element count (each element is of
-                                   // size transfer_data_size)
-                          false);  // start
+                          rx,                             // write address
+                          &spi_get_hw(pSPI->hw_inst)->dr, // read address
+                          length, // element count (each element is of
+                                  // size transfer_data_size)
+                          false); // start
 
     // start them exactly simultaneously to avoid races (in extreme cases
     // the FIFO could overflow)
@@ -106,8 +106,8 @@ bool spi_transfer(spi_t *pSPI, const uint8_t *tx, uint8_t *rx, size_t length) {
     /* Timeout 1 sec */
     uint32_t timeOut = 1000;
     /* Wait until master completes transfer or time out has occured. */
-    bool rc = sem_acquire_timeout_ms(
-        &pSPI->sem, timeOut);  // Wait for notification from ISR
+    bool rc = sem_acquire_timeout_ms(&pSPI->sem,
+                                     timeOut); // Wait for notification from ISR
     if (!rc) {
         // If the timeout is reached the function will return false
         DBG_PRINTF("Notification wait timed out in %s\n", __FUNCTION__);
@@ -137,9 +137,10 @@ bool my_spi_init(spi_t *pSPI) {
     mutex_enter_blocking(&my_spi_init_mutex);
     if (!pSPI->initialized) {
         //// The SPI may be shared (using multiple SSs); protect it
-        //pSPI->mutex = xSemaphoreCreateRecursiveMutex();
-        //xSemaphoreTakeRecursive(pSPI->mutex, portMAX_DELAY);
-        if (!mutex_is_initialized(&pSPI->mutex)) mutex_init(&pSPI->mutex);
+        // pSPI->mutex = xSemaphoreCreateRecursiveMutex();
+        // xSemaphoreTakeRecursive(pSPI->mutex, portMAX_DELAY);
+        if (!mutex_is_initialized(&pSPI->mutex))
+            mutex_init(&pSPI->mutex);
         spi_lock(pSPI);
 
         // For the IRQ notification:
@@ -156,17 +157,20 @@ bool my_spi_init(spi_t *pSPI) {
         // ss_gpio is initialized in sd_init_driver()
 
         // Slew rate limiting levels for GPIO outputs.
-        // enum gpio_slew_rate { GPIO_SLEW_RATE_SLOW = 0, GPIO_SLEW_RATE_FAST = 1 }
-        // void gpio_set_slew_rate (uint gpio,enum gpio_slew_rate slew)
+        // enum gpio_slew_rate { GPIO_SLEW_RATE_SLOW = 0, GPIO_SLEW_RATE_FAST =
+        // 1 } void gpio_set_slew_rate (uint gpio,enum gpio_slew_rate slew)
         // Default appears to be GPIO_SLEW_RATE_SLOW.
 
         // Drive strength levels for GPIO outputs.
-        // enum gpio_drive_strength { GPIO_DRIVE_STRENGTH_2MA = 0, GPIO_DRIVE_STRENGTH_4MA = 1, GPIO_DRIVE_STRENGTH_8MA = 2,
+        // enum gpio_drive_strength { GPIO_DRIVE_STRENGTH_2MA = 0,
+        // GPIO_DRIVE_STRENGTH_4MA = 1, GPIO_DRIVE_STRENGTH_8MA = 2,
         // GPIO_DRIVE_STRENGTH_12MA = 3 }
         // enum gpio_drive_strength gpio_get_drive_strength (uint gpio)
         if (pSPI->set_drive_strength) {
-            gpio_set_drive_strength(pSPI->mosi_gpio, pSPI->mosi_gpio_drive_strength);
-            gpio_set_drive_strength(pSPI->sck_gpio, pSPI->sck_gpio_drive_strength);
+            gpio_set_drive_strength(pSPI->mosi_gpio,
+                                    pSPI->mosi_gpio_drive_strength);
+            gpio_set_drive_strength(pSPI->sck_gpio,
+                                    pSPI->sck_gpio_drive_strength);
         }
 
         // SD cards' DO MUST be pulled up.

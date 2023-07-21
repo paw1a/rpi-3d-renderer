@@ -1,14 +1,14 @@
 /* sd_spi.c
 Copyright 2021 Carl John Kugler III
 
-Licensed under the Apache License, Version 2.0 (the License); you may not use 
-this file except in compliance with the License. You may obtain a copy of the 
+Licensed under the Apache License, Version 2.0 (the License); you may not use
+this file except in compliance with the License. You may obtain a copy of the
 License at
 
-   http://www.apache.org/licenses/LICENSE-2.0 
-Unless required by applicable law or agreed to in writing, software distributed 
-under the License is distributed on an AS IS BASIS, WITHOUT WARRANTIES OR 
-CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+   http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an AS IS BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 */
 
@@ -24,15 +24,16 @@ specific language governing permissions and limitations under the License.
 #include "sd_spi.h"
 #include "spi.h"
 
-//#define TRACE_PRINTF(fmt, args...)
-#define TRACE_PRINTF printf  // task_printf
+// #define TRACE_PRINTF(fmt, args...)
+#define TRACE_PRINTF printf // task_printf
 
 void sd_spi_go_high_frequency(sd_card_t *pSD) {
     uint actual = spi_set_baudrate(pSD->spi->hw_inst, pSD->spi->baud_rate);
     TRACE_PRINTF("%s: Actual frequency: %lu\n", __FUNCTION__, (long)actual);
 }
 void sd_spi_go_low_frequency(sd_card_t *pSD) {
-    uint actual = spi_set_baudrate(pSD->spi->hw_inst, 400 * 1000); // Actual frequency: 398089
+    uint actual = spi_set_baudrate(pSD->spi->hw_inst,
+                                   400 * 1000); // Actual frequency: 398089
     TRACE_PRINTF("%s: Actual frequency: %lu\n", __FUNCTION__, (long)actual);
 }
 
@@ -40,7 +41,7 @@ static void sd_spi_lock(sd_card_t *pSD) {
     spi_lock(pSD->spi);
 }
 static void sd_spi_unlock(sd_card_t *pSD) {
-   spi_unlock(pSD->spi);
+    spi_unlock(pSD->spi);
 }
 
 // Would do nothing if pSD->ss_gpio were set to GPIO_FUNC_SPI.
@@ -99,7 +100,7 @@ uint8_t sd_spi_write(sd_card_t *pSD, const uint8_t value) {
     return received;
 }
 
-void sd_spi_send_initializing_sequence(sd_card_t * pSD) {
+void sd_spi_send_initializing_sequence(sd_card_t *pSD) {
     bool old_ss = gpio_get(pSD->ss_gpio);
     // Set DI and CS high and apply 74 or more clock pulses to SCLK:
     gpio_put(pSD->ss_gpio, 1);
