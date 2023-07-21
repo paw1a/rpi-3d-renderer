@@ -114,7 +114,7 @@ int main() {
                        BLACK, set_pixel);
 
         GFX_setCursor(0, 0);
-        GFX_printf("Hello GFX!\n%d", 123456);
+        GFX_printf("Raspberry Pi Pico\nFPS: %d", 23);
         GFX_flush();
     }
 }
