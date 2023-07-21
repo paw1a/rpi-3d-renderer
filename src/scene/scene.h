@@ -2,8 +2,8 @@
 
 #include "object.h"
 
-#include <vector>
 #include <map>
+#include <vector>
 
 struct camera {
     m3::vec3 position;

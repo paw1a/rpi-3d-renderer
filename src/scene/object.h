@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
 #include "common.h"
 #include "math3d.h"
+#include <vector>
 
 struct face {
     std::vector<size_t> vertex_indices;

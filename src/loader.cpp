@@ -1,8 +1,8 @@
 #include "loader.h"
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 #include "f_util.h"
 #include "ff.h"
@@ -30,14 +30,16 @@ char *read_file(const char *filename) {
     FIL file;
     FRESULT result = f_open(&file, filename, FA_READ);
     if (result != FR_OK && result != FR_EXIST) {
-        std::cout << "f_open(%s) error: " << filename << " " << FRESULT_str(result) << " " << result << std::endl;
+        std::cout << "f_open(%s) error: " << filename << " "
+                  << FRESULT_str(result) << " " << result << std::endl;
         return nullptr;
     }
 
     FILINFO info;
     result = f_stat(filename, &info);
     if (result != FR_OK) {
-        std::cout << "f_stat error: " << FRESULT_str(result) << " " << result << std::endl;
+        std::cout << "f_stat error: " << FRESULT_str(result) << " " << result
+                  << std::endl;
         return nullptr;
     }
 
@@ -45,19 +47,21 @@ char *read_file(const char *filename) {
     size_t read;
     result = f_read(&file, buffer, info.fsize, &read);
     if (result != FR_OK) {
-        std::cout << "f_read error: " << FRESULT_str(result) << " " << result << std::endl;
+        std::cout << "f_read error: " << FRESULT_str(result) << " " << result
+                  << std::endl;
         return nullptr;
     }
 
     if (read != info.fsize) {
-        std::cout << "f_read error: read bytes mismatch file size = " << info.fsize
-        << ", read = " << read << std::endl;
+        std::cout << "f_read error: read bytes mismatch file size = "
+                  << info.fsize << ", read = " << read << std::endl;
         return nullptr;
     }
 
     result = f_close(&file);
     if (result != FR_OK) {
-        std::cout << "f_close error: " << FRESULT_str(result) << " " << result << std::endl;
+        std::cout << "f_close error: " << FRESULT_str(result) << " " << result
+                  << std::endl;
         return nullptr;
     }
 
@@ -149,8 +153,7 @@ bool load_objects(std::istream &is,
     return true;
 }
 
-bool load_materials(std::istream &is,
-                    std::vector<material> &materials,
+bool load_materials(std::istream &is, std::vector<material> &materials,
                     std::map<std::string, size_t> &material_names) {
     material material = {};
     std::string material_name;
@@ -167,9 +170,9 @@ bool load_materials(std::istream &is,
 
         if (tokens.size() == 2 && tokens[0] == "newmtl") {
             if (!material_name.empty()) {
-                materials.push_back({{material.color.r * ns,
-                                      material.color.g * ns,
-                                      material.color.b * ns}});
+                materials.push_back(
+                    {{material.color.r * ns, material.color.g * ns,
+                      material.color.b * ns}});
                 material_names[material_name] = index++;
             }
 
@@ -185,8 +188,7 @@ bool load_materials(std::istream &is,
     }
 
     if (!material_name.empty()) {
-        materials.push_back({{material.color.r * ns,
-                              material.color.g * ns,
+        materials.push_back({{material.color.r * ns, material.color.g * ns,
                               material.color.b * ns}});
         material_names[material_name] = index;
     }
@@ -226,26 +228,28 @@ bool load_scene(std::istream &is, scene &scene) {
 
         if (tokens.size() == 4 && tokens[0] == "ct")
             scene.camera.target = {stof(tokens[1]), stof(tokens[2]),
-                                     stof(tokens[3])};
+                                   stof(tokens[3])};
 
         if (tokens.size() == 4 && tokens[0] == "cu")
             scene.camera.up = {stof(tokens[1]), stof(tokens[2]),
-                                     stof(tokens[3])};
+                               stof(tokens[3])};
     }
 
     char *data = read_file(material_path.c_str());
     std::istringstream material_iss(data);
     std::map<std::string, size_t> material_names;
     if (!load_materials(material_iss, scene.materials, material_names)) {
-        std::cout << "failed to load materials from file " << object_path << std::endl;
+        std::cout << "failed to load materials from file " << object_path
+                  << std::endl;
         return false;
     }
-    delete [] data;
+    delete[] data;
 
     data = read_file(object_path.c_str());
     std::istringstream object_iss(data);
     if (!load_objects(object_iss, material_names, scene.objects)) {
-        std::cout << "failed to load objects from file " << object_path << std::endl;
+        std::cout << "failed to load objects from file " << object_path
+                  << std::endl;
         return false;
     }
 

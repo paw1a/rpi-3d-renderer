@@ -105,8 +105,7 @@ bool load_objects(std::ifstream &ifs,
     return true;
 }
 
-bool load_materials(std::ifstream &ifs,
-                    std::vector<material> &materials,
+bool load_materials(std::ifstream &ifs, std::vector<material> &materials,
                     std::map<std::string, size_t> &material_names) {
     material material = {};
     std::string material_name;
@@ -123,9 +122,9 @@ bool load_materials(std::ifstream &ifs,
 
         if (tokens.size() == 2 && tokens[0] == "newmtl") {
             if (!material_name.empty()) {
-                materials.push_back({{material.color.r * ns,
-                                      material.color.g * ns,
-                                      material.color.b * ns}});
+                materials.push_back(
+                    {{material.color.r * ns, material.color.g * ns,
+                      material.color.b * ns}});
                 material_names[material_name] = index++;
             }
 
@@ -141,8 +140,7 @@ bool load_materials(std::ifstream &ifs,
     }
 
     if (!material_name.empty()) {
-        materials.push_back({{material.color.r * ns,
-                              material.color.g * ns,
+        materials.push_back({{material.color.r * ns, material.color.g * ns,
                               material.color.b * ns}});
         material_names[material_name] = index;
     }
@@ -182,22 +180,24 @@ bool load_scene(std::ifstream &ifs, scene &scene) {
 
         if (tokens.size() == 4 && tokens[0] == "ct")
             scene.camera.target = {stof(tokens[1]), stof(tokens[2]),
-                                     stof(tokens[3])};
+                                   stof(tokens[3])};
 
         if (tokens.size() == 4 && tokens[0] == "cu")
             scene.camera.up = {stof(tokens[1]), stof(tokens[2]),
-                                     stof(tokens[3])};
+                               stof(tokens[3])};
     }
 
     std::ifstream material_ifs(material_path, std::ios::in);
     if (!material_ifs.is_open()) {
-        std::cout << "failed to open material file " << object_path << std::endl;
+        std::cout << "failed to open material file " << object_path
+                  << std::endl;
         return false;
     }
 
     std::map<std::string, size_t> material_names;
     if (!load_materials(material_ifs, scene.materials, material_names)) {
-        std::cout << "failed to load materials from file " << object_path << std::endl;
+        std::cout << "failed to load materials from file " << object_path
+                  << std::endl;
         return false;
     }
 
@@ -208,7 +208,8 @@ bool load_scene(std::ifstream &ifs, scene &scene) {
     }
 
     if (!load_objects(object_ifs, material_names, scene.objects)) {
-        std::cout << "failed to load objects from file " << object_path << std::endl;
+        std::cout << "failed to load objects from file " << object_path
+                  << std::endl;
         return false;
     }
 

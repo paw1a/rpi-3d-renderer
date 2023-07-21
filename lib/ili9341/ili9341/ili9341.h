@@ -1,31 +1,24 @@
-#ifndef _ILI9341_H
-#define _ILI9341_H
+#ifndef ILI9341_H
+#define ILI9341_H
 
-#include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 
-/*
-#define SPI_PORT spi0
-#define PIN_MISO 4
-#define PIN_CS   5
-#define PIN_SCK  6
-#define PIN_MOSI 7
-#define PIN_RESET 8
-#define PIN_DC 9  // data/command
-*/
+// Use DMA?
+#define USE_DMA 1
 
-typedef struct {
-    spi_inst_t *port;
-    uint pin_miso;
-    uint pin_cs;
-    uint pin_sck;
-    uint pin_mosi;
-    uint pin_reset;
-    uint pin_dc;
-} ili9341_config_t;
+#define MADCTL_MY 0x80  ///< Bottom to top
+#define MADCTL_MX 0x40  ///< Right to left
+#define MADCTL_MV 0x20  ///< Reverse Mode
+#define MADCTL_ML 0x10  ///< LCD refresh Bottom to top
+#define MADCTL_RGB 0x00 ///< Red-Green-Blue pixel order
+#define MADCTL_BGR 0x08 ///< Blue-Green-Red pixel order
+#define MADCTL_MH 0x04  ///< LCD refresh right to left
 
-extern ili9341_config_t ili9341_config;
 
 #define ILI9341_TFTWIDTH 240  ///< ILI9341 max TFT width
 #define ILI9341_TFTHEIGHT 320 ///< ILI9341 max TFT height
@@ -86,15 +79,29 @@ extern ili9341_config_t ili9341_config;
 
 #define ILI9341_GMCTRP1 0xE0 ///< Positive Gamma Correction
 #define ILI9341_GMCTRN1 0xE1 ///< Negative Gamma Correction
-//#define ILI9341_PWCTR6     0xFC
 
-extern const uint8_t font6x8[];
+// Some ready-made 16-bit ('565') color settings:
+#define ILI9341_BLACK 0x0000
+#define ILI9341_WHITE 0xFFFF
+#define ILI9341_RED 0xF800
+#define ILI9341_GREEN 0x07E0
+#define ILI9341_BLUE 0x001F
+#define ILI9341_CYAN 0x07FF
+#define ILI9341_MAGENTA 0xF81F
+#define ILI9341_YELLOW 0xFFE0
+#define ILI9341_ORANGE 0xFC00
 
-void ili9341_init();
-void ili9341_set_command(uint8_t cmd);
-void ili9341_command_param(uint8_t data);
-void ili9341_write_data(void *buffer, int bytes);
-void ili9341_start_writing();
-void ili9341_stop_writing();
-void ili9341_write_data_continuous(void *biffer, int bytes);
+void LCD_setPins(uint16_t dc, uint16_t cs, int16_t rst, uint16_t sck, uint16_t tx);
+void LCD_setSPIperiph(spi_inst_t *s);
+void LCD_initDisplay();
+
+void LCD_setRotation(uint8_t m);
+
+void LCD_WritePixel(int x, int y, uint16_t col);
+void LCD_WriteBitmap(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t *bitmap);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
