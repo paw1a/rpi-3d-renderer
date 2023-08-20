@@ -30,7 +30,7 @@ static void set_pixel(point2 point, uint16_t rgb565_color) {
 
 int main() {
     scene scene;
-    std::string scene_path = "models/cube.scene";
+    std::string scene_path = "models/spheres.scene";
     std::ifstream ifs(scene_path, std::ios::in);
     if (!ifs.is_open()) {
         std::cout << "failed to open scene file " << scene_path << std::endl;
