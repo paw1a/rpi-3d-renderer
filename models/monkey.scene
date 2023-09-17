@@ -1,8 +1,8 @@
 # path to .obj file
-o models/spheres.obj
+o models/monkey.obj
 
 # path to .mtl file
-m models/spheres.mtl
+m models/monkey.mtl
 
 # light positions
 l -1.0 -1.0 -1.0

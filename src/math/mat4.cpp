@@ -348,4 +348,4 @@ vec3 to_euler(const mat4 &m, const std::string &order, bool degree) {
 
     return euler;
 }
-} // namespace m3
+}
