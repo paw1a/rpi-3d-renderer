@@ -1,0 +1,51 @@
+\documentclass{bmstu}
+\usepackage[]{svg}
+\usepackage[]{pdfpages}
+\usepackage{multirow}
+\usepackage{amsmath}
+
+\newcounter{myfigure}
+\pretocmd{\figure}{\stepcounter{myfigure}}{}{}
+\renewcommand{\thefigure}{\arabic{myfigure}}
+\newcounter{mytable}
+\pretocmd{\table}{\stepcounter{mytable}}{}{}
+\renewcommand{\thetable}{\arabic{mytable}}
+
+\renewcommand{\theequation}{\arabic{equation}}
+
+\setenumerate[1]{label={ \arabic*)}}
+\NewBibliographyString{accessmode}
+\DeclareFieldFormat{url}{\bibstring{accessmode}\addcolon\space\url{#1}}
+\DeclareFieldFormat{title}{#1}
+\DefineBibliographyStrings{russian}{
+accessmode={Режим доступа:},
+urlseen={дата обращения:}
+}
+\captionsetup[table]{justification=raggedright,singlelinecheck=off}
+\renewcommand\labelitemi{---}
+
+\bibliography{biblio}
+
+\begin{document}
+\renewcommand{\thelstlisting}{\arabic{lstlisting}}
+
+\makecourseworktitle
+    {Информатика и системы управления}
+    {Программное обеспечение ЭВМ и информационные технологии}
+    {Проектирование программно-аппаратного комплекса <<Куб для визуализации трехмерного изображения>>}
+    {Шпаковский~П.~А./ИУ7-53Б}
+    {Строганов~Ю.~В.}
+    {}
+
+\maketableofcontents
+
+\include{intro}
+\include{analysis}
+\include{design}
+\include{techn}
+\include{research}
+\include{conclusion}
+
+\makebibliography
+
+\end{document}

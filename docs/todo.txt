@@ -1,2 +1,0 @@
-- line by line file read
-- try to increase display frequency
