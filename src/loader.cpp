@@ -1,11 +1,10 @@
 #include "loader.h"
+#include "dataset.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include "f_util.h"
-#include "ff.h"
 
 static std::vector<std::string> split(const std::string &s,
                                       const std::string &delimiter) {
@@ -24,50 +23,6 @@ static std::vector<std::string> split(const std::string &s,
 
     res.push_back(s.substr(pos_start));
     return res;
-}
-
-char *read_file(const char *filename) {
-    FIL file;
-    FRESULT result = f_open(&file, filename, FA_READ);
-    if (result != FR_OK && result != FR_EXIST) {
-        std::cout << "f_open(%s) error: " << filename << " "
-                  << FRESULT_str(result) << " " << result << std::endl;
-        return nullptr;
-    }
-
-    FILINFO info;
-    result = f_stat(filename, &info);
-    if (result != FR_OK) {
-        std::cout << "f_stat error: " << FRESULT_str(result) << " " << result
-                  << std::endl;
-        return nullptr;
-    }
-
-    char *buffer = new char[info.fsize + 1];
-    size_t read;
-    result = f_read(&file, buffer, info.fsize, &read);
-    if (result != FR_OK) {
-        std::cout << "f_read error: " << FRESULT_str(result) << " " << result
-                  << std::endl;
-        return nullptr;
-    }
-
-    if (read != info.fsize) {
-        std::cout << "f_read error: read bytes mismatch file size = "
-                  << info.fsize << ", read = " << read << std::endl;
-        return nullptr;
-    }
-
-    result = f_close(&file);
-    if (result != FR_OK) {
-        std::cout << "f_close error: " << FRESULT_str(result) << " " << result
-                  << std::endl;
-        return nullptr;
-    }
-
-    buffer[info.fsize] = 0;
-
-    return buffer;
 }
 
 bool load_objects(std::istream &is,
@@ -201,22 +156,18 @@ bool load_materials(std::istream &is, std::vector<material> &materials,
     return true;
 }
 
-bool load_scene(std::istream &is, scene &scene) {
-    std::string object_path{};
-    std::string material_path{};
-    for (std::string line; getline(is, line);) {
+bool load_scene(scene &scene) {
+    dataset dataset = datasets[1];
+    const char *data = dataset.scene;
+    std::istringstream iss(data);
+
+    for (std::string line; getline(iss, line);) {
         size_t str_index;
         while ((str_index = line.find('\t')) != std::string::npos)
             line.erase(str_index, 1);
 
         std::vector<std::string> tokens = split(line, " ");
         tokens.erase(remove(tokens.begin(), tokens.end(), ""), tokens.end());
-
-        if (tokens.size() == 2 && tokens[0] == "o")
-            object_path = {tokens[1]};
-
-        if (tokens.size() == 2 && tokens[0] == "m")
-            material_path = {tokens[1]};
 
         if (tokens.size() == 4 && tokens[0] == "l")
             scene.lights.emplace_back(stof(tokens[1]), stof(tokens[2]),
@@ -235,20 +186,19 @@ bool load_scene(std::istream &is, scene &scene) {
                                stof(tokens[3])};
     }
 
-    char *data = read_file(material_path.c_str());
+    data = dataset.mtl;
     std::istringstream material_iss(data);
     std::map<std::string, size_t> material_names;
     if (!load_materials(material_iss, scene.materials, material_names)) {
-        std::cout << "failed to load materials from file " << object_path
+        std::cout << "failed to load materials for " << dataset.name
                   << std::endl;
         return false;
     }
-    delete[] data;
 
-    data = read_file(object_path.c_str());
+    data = dataset.obj;
     std::istringstream object_iss(data);
     if (!load_objects(object_iss, material_names, scene.objects)) {
-        std::cout << "failed to load objects from file " << object_path
+        std::cout << "failed to load objects for " << dataset.name
                   << std::endl;
         return false;
     }

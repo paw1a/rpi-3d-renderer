@@ -32,6 +32,7 @@ add_executable(rpi-pico
         src/main.cpp
         src/loader.cpp
         src/hw_config.cpp
+        src/dataset.cpp
         )
 
 pico_add_extra_outputs(rpi-pico)

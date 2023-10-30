@@ -1,12 +1,10 @@
 #include <iostream>
-#include <sstream>
 #include <vector>
 
-#include "f_util.h"
-#include "ff.h"
 #include "gfx.h"
+#include "gfxfont.h"
+#include "font.h"
 #include "hardware/spi.h"
-#include "hw_config.h"
 #include "ili9341.h"
 #include "pico/stdlib.h"
 #include "rtc.h"
@@ -25,6 +23,9 @@
 #define PIN_DC 8
 #define PIN_RST 9
 
+extern char __bss_end__;
+extern char __StackLimit;
+
 static void set_pixel(point2 point, uint16_t color) {
     GFX_drawPixel(point.x + SCREEN_WIDTH / 2, point.y + SCREEN_HEIGHT / 2,
                   color);
@@ -42,37 +43,34 @@ int main() {
     LCD_setRotation(3);
     GFX_createFramebuf();
 
-    sd_card_t *sd = sd_get_by_num(0);
-    FRESULT result = f_mount(&sd->fatfs, sd->pcName, 1);
-    if (result != FR_OK) {
-        std::cout << "f_mount error: " << FRESULT_str(result) << " " << result
-                  << std::endl;
-        return -1;
+    GFX_clearScreen();
+    GFX_setCursor(0, 24);
+    GFX_setFont(&free_mono_24pt);
+    GFX_printf("LOADING...");
+    GFX_flush();
+
+    char *ptr, *prev;
+    prev = new char[1024];
+    uint32_t num = 0;
+    while ((ptr = new char[1024]) != nullptr) {
+        num++;
+        if (ptr != prev + 1024)
+            std::cout << num << " " << std::hex << (uint32_t)ptr << std::endl;
+        prev = ptr;
     }
 
     scene scene;
-    std::string filename = "models/cube.scene";
-    char *data = read_file(filename.c_str());
-    std::istringstream iss(data);
-    if (!load_scene(iss, scene)) {
-        std::cout << "failed to load scene file " << filename << std::endl;
+    if (!load_scene(scene)) {
+        std::cout << "failed to load scene" << std::endl;
         return -1;
-    }
-    delete[] data;
-
-    for (auto const &object : scene.objects) {
-        std::cout << object << std::endl;
     }
 
     size_t polygons_size = 0;
     for (auto &object : scene.objects)
         polygons_size += object.faces.size();
 
-    array<polygon> polygons = {new polygon[polygons_size], polygons_size};
     std::cout << "polygons count = " << polygons_size << std::endl;
-
-    f_unmount(sd->pcName);
-    std::cout << "Goodbye world" << std::endl;
+    array<polygon> polygons = {new polygon[polygons_size], polygons_size};
 
     float angle = 0;
     for (;;) {
@@ -113,8 +111,6 @@ int main() {
                         polygons},
                        BLACK, set_pixel);
 
-        GFX_setCursor(0, 0);
-        GFX_printf("Raspberry Pi Pico\nFPS: %d", 23);
         GFX_flush();
     }
 }
