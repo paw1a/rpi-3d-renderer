@@ -2,16 +2,15 @@
 
 #include "common.h"
 #include "math3d.h"
-#include <vector>
 
 struct face {
-    std::vector<size_t> vertex_indices;
+    array<size_t> vertex_indices;
     size_t normal_index;
     size_t material_index;
 };
 
 struct object {
-    std::vector<face> faces;
-    std::vector<m3::vec3> vertices;
-    std::vector<m3::vec3> normals;
+    array<face> faces;
+    array<m3::vec3> vertices;
+    array<m3::vec3> normals;
 };

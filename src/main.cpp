@@ -23,8 +23,8 @@
 #define PIN_DC 8
 #define PIN_RST 9
 
-extern char __bss_end__;
-extern char __StackLimit;
+extern uint8_t __bss_end__;
+extern uint8_t __StackLimit;
 
 static void set_pixel(point2 point, uint16_t color) {
     GFX_drawPixel(point.x + SCREEN_WIDTH / 2, point.y + SCREEN_HEIGHT / 2,
@@ -49,28 +49,54 @@ int main() {
     GFX_printf("LOADING...");
     GFX_flush();
 
-    char *ptr, *prev;
-    prev = new char[1024];
-    uint32_t num = 0;
-    while ((ptr = new char[1024]) != nullptr) {
-        num++;
-        if (ptr != prev + 1024)
-            std::cout << num << " " << std::hex << (uint32_t)ptr << std::endl;
-        prev = ptr;
-    }
+//    char *ptr, *prev;
+//    prev = new char[1024];
+//    uint32_t num = 0;
+//    while ((ptr = new char[1024]) != nullptr) {
+//        num++;
+//        if (ptr != prev + 1024)
+//            std::cout << num << " " << std::hex << (uint32_t)ptr << std::endl;
+//        prev = ptr;
+//    }
+
+    std::cout << "Start to load scene" << std::endl;
 
     scene scene;
-    if (!load_scene(scene)) {
+    dataset dataset = datasets[1];
+    if (!load_scene(dataset, scene)) {
         std::cout << "failed to load scene" << std::endl;
         return -1;
     }
 
+    for (size_t i = 0; i < scene.lights.size(); i++) {
+        std::cout << scene.lights[i] << std::endl;
+    }
+
+    for (size_t i = 0; i < scene.materials.size(); i++) {
+        std::cout << scene.materials[i] << std::endl;
+    }
+
+    for (size_t i = 0; i < scene.objects.size(); i++) {
+        std::cout << scene.objects[i] << std::endl;
+    }
+
     size_t polygons_size = 0;
-    for (auto &object : scene.objects)
-        polygons_size += object.faces.size();
+    for (size_t i = 0; i < scene.objects.size(); i++)
+        polygons_size += scene.objects[i].faces.size();
 
     std::cout << "polygons count = " << polygons_size << std::endl;
-    array<polygon> polygons = {new polygon[polygons_size], polygons_size};
+    array<polygon> polygons(polygons_size);
+    size_t polygon_index = 0;
+    for (size_t i = 0; i < scene.objects.size(); i++) {
+        object object = scene.objects[i];
+        for (size_t j = 0; j < object.faces.size(); j++) {
+            face face = object.faces[j];
+            polygons[polygon_index++].vertices =
+                array<m3::tvec2<int16_t>>(face.vertex_indices.size());
+        }
+    }
+
+    std::cout << "polygons count = " << polygons_size << std::endl;
 
     float angle = 0;
     for (;;) {
@@ -86,9 +112,11 @@ int main() {
         m3::mat4 perspective = m3::perspective(80, 1, 1.1f, 10.0f);
         m3::mat4 transform = scale * perspective * view;
 
-        for (auto &object : scene.objects) {
-            for (auto &vertice : object.vertices) {
-                vertice = m3::transform_vector(transform, vertice);
+        for (size_t i = 0; i < scene.objects.size(); i++) {
+            object object = scene.objects[i];
+            for (size_t j = 0; j < object.vertices.size(); j++) {
+                object.vertices[j] =
+                    m3::transform_vector(transform, object.vertices[j]);
             }
         }
 
@@ -98,9 +126,11 @@ int main() {
         }
 
         transform = m3::inverse(transform);
-        for (auto &object : scene.objects) {
-            for (auto &vertice : object.vertices) {
-                vertice = m3::transform_vector(transform, vertice);
+        for (size_t i = 0; i < scene.objects.size(); i++) {
+            object object = scene.objects[i];
+            for (size_t j = 0; j < object.vertices.size(); j++) {
+                object.vertices[j] =
+                    m3::transform_vector(transform, object.vertices[j]);
             }
         }
 

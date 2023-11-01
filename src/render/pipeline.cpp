@@ -77,18 +77,21 @@ static bool solve_slae(std::vector<float> &res_column,
     return true;
 }
 
-static void compute_plane_equation(const std::vector<m3::vec3> &vertices,
-                                   polygon &polygon) {
+static void compute_plane_equation(const array<size_t> &vertex_indices,
+                                   object &object, polygon &polygon) {
     polygon.a = polygon.b = polygon.c = 0;
     polygon.d = 1000;
-    for (size_t i = 0; i < vertices.size() - 2; ++i) {
-        for (size_t j = i + 1; j < vertices.size() - 1; ++j) {
-            for (size_t k = j + 1; k < vertices.size(); ++k) {
+    for (size_t i = 0; i < vertex_indices.size() - 2; ++i) {
+        for (size_t j = i + 1; j < vertex_indices.size() - 1; ++j) {
+            for (size_t k = j + 1; k < vertex_indices.size(); ++k) {
                 std::vector<float> res(3, 0.);
+                m3::vec3 &vi = object.vertices[vertex_indices[i]];
+                m3::vec3 &vj = object.vertices[vertex_indices[j]];
+                m3::vec3 &vk = object.vertices[vertex_indices[k]];
                 std::vector<std::vector<float>> matrix = {
-                    {vertices[i].x, vertices[i].y, vertices[i].z},
-                    {vertices[j].x, vertices[j].y, vertices[j].z},
-                    {vertices[k].x, vertices[k].y, vertices[k].z}};
+                    {vi.x, vi.y, vi.z},
+                    {vj.x, vj.y, vj.z},
+                    {vk.x, vk.y, vk.z}};
                 std::vector<float> free_factor_column(3, -polygon.d);
 
                 if (solve_slae(res, matrix, free_factor_column)) {
@@ -103,11 +106,11 @@ static void compute_plane_equation(const std::vector<m3::vec3> &vertices,
 }
 
 static uint16_t material_to_rgb565(const material &material,
-                                   const std::vector<m3::vec3> &lights,
+                                   const array<m3::vec3> &lights,
                                    const m3::vec3 &normal) {
     float light_percent = 0.0;
-    for (auto &light : lights) {
-        float percent = cos_angle(light, normal);
+    for (size_t i = 0; i < lights.size(); i++) {
+        float percent = cos_angle(lights[i], normal);
         if (percent > 0)
             light_percent += percent;
     }
@@ -130,25 +133,25 @@ static uint16_t material_to_rgb565(const material &material,
 }
 
 bool scene_to_polygons(const scene &scene, array<polygon> &polygons) {
-    size_t i = 0;
-    for (auto const &object : scene.objects) {
-        for (auto &face : object.faces) {
-            std::vector<m3::vec3> vertices;
-            for (auto &index : face.vertex_indices)
-                vertices.push_back(object.vertices[index]);
-
+    size_t index = 0;
+    for (size_t i = 0; i < scene.objects.size(); i++) {
+        object object = scene.objects[i];
+        for (size_t j = 0; j < object.faces.size(); j++) {
+            face face = object.faces[j];
             polygon polygon;
-            for (auto &vertex : vertices) {
+            for (size_t k = 0; k < face.vertex_indices.size(); k++) {
+                size_t vertex_index = face.vertex_indices[k];
+                m3::vec3 &vertex = object.vertices[vertex_index];
                 auto x = static_cast<int16_t>(vertex.x);
                 auto y = static_cast<int16_t>(vertex.y);
-                polygon.vertices.emplace_back(x, y);
+                polygon.vertices[k] = {x, y};
             }
 
             material material = scene.materials[face.material_index];
             polygon.color = material_to_rgb565(
                 material, scene.lights, object.normals[face.normal_index]);
-            compute_plane_equation(vertices, polygon);
-            polygons.data[i++] = polygon;
+            compute_plane_equation(face.vertex_indices, object, polygon);
+            polygons[index++] = polygon;
         }
     }
 

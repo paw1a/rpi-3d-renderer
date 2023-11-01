@@ -16,8 +16,8 @@ std::ostream &operator<<(std::ostream &os, const material &material) {
 
 std::ostream &operator<<(std::ostream &os, const face &face) {
     os << "face vertex indices: ";
-    for (auto &vertex_index : face.vertex_indices)
-        os << vertex_index << ", ";
+    for (size_t i = 0; i < face.vertex_indices.size(); i++)
+        os << face.vertex_indices[i] << ", ";
     os << std::endl;
 
     os << "face normal index: " << face.normal_index << std::endl;
@@ -28,24 +28,24 @@ std::ostream &operator<<(std::ostream &os, const face &face) {
 
 std::ostream &operator<<(std::ostream &os, const object &object) {
     os << "vertices:" << std::endl;
-    for (auto &vertex : object.vertices)
-        os << vertex << std::endl;
+    for (size_t i = 0; i < object.vertices.size(); i++)
+        os << object.vertices[i] << std::endl;
 
     os << "normals:" << std::endl;
-    for (auto &normal : object.normals)
-        os << normal << std::endl;
+    for (size_t i = 0; i < object.normals.size(); i++)
+        os << object.normals[i] << std::endl;
 
     os << "faces:" << std::endl;
-    for (auto &face : object.faces)
-        os << face << std::endl << std::endl;
+    for (size_t i = 0; i < object.faces.size(); i++)
+        os << object.faces[i] << std::endl << std::endl;
 
     return os;
 }
 
 std::ostream &operator<<(std::ostream &os, const polygon &polygon) {
     os << "polygon vertices: ";
-    for (auto &vertex : polygon.vertices)
-        os << vertex << ", ";
+    for (size_t i = 0; i < polygon.vertices.size(); i++)
+        os << polygon.vertices[i] << ", ";
     os << std::endl;
 
     os << "polygon plane factors: " << polygon.a << ", " << polygon.b << ", "

@@ -18,6 +18,7 @@ include_directories(
         src/math
         src/render
         src/scene
+        src
 )
 
 add_executable(rpi-pico
@@ -33,6 +34,7 @@ add_executable(rpi-pico
         src/loader.cpp
         src/hw_config.cpp
         src/dataset.cpp
+        src/allocator.cpp
         )
 
 pico_add_extra_outputs(rpi-pico)
