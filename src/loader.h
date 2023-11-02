@@ -9,9 +9,4 @@
 #include <map>
 #include <vector>
 
-bool load_materials(dataset &dataset, array<material> &materials,
-                    std::map<std::string, size_t> &material_names);
-bool load_objects(dataset &dataset,
-                  const std::map<std::string, size_t> &material_names,
-                  array<object> &objects);
 bool load_scene(dataset &dataset, scene &scene);

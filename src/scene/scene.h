@@ -3,6 +3,7 @@
 #include "object.h"
 
 #include <map>
+#include <vector>
 
 struct camera {
     m3::vec3 position;
@@ -11,8 +12,8 @@ struct camera {
 };
 
 struct scene {
-    array<object> objects;
-    array<material> materials;
-    array<m3::vec3> lights;
+    std::vector<object> objects;
+    std::vector<material> materials;
+    std::vector<m3::vec3> lights;
     struct camera camera;
 };

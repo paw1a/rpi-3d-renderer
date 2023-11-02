@@ -113,13 +113,13 @@ static relationship check_relationship(const polygon &polygon,
 
 static void fill_pixel(const point2 &point, array<polygon> &polygons,
                        void set_pixel(point2, uint16_t)) {
-    uint16_t color = polygons[0].color;
-    float z_max = get_z(polygons[0], point);
-    for (int i = 1; i < polygons.size(); ++i) {
-        float z = get_z(polygons[i], point);
+    uint16_t color = polygons.data[0].color;
+    float z_max = get_z(polygons.data[0], point);
+    for (int i = 1; i < polygons.size; ++i) {
+        float z = get_z(polygons.data[i], point);
         if (z > z_max) {
             z_max = z;
-            color = polygons[i].color;
+            color = polygons.data[i].color;
         }
     }
 
@@ -182,13 +182,13 @@ std::pair<bool, polygon> find_cover_polygon(const window &window,
     size_t polygon_indices[4] = {0};
     float z_max[4];
     for (uint32_t i = 0; i < 4; ++i)
-        z_max[i] = get_z(polygons[0], window_vertices[i]);
+        z_max[i] = get_z(polygons.data[0], window_vertices[i]);
 
-    for (uint32_t i = 1; i < polygons.size(); ++i) {
+    for (uint32_t i = 1; i < polygons.size; ++i) {
         float z[4];
 
         for (uint32_t j = 0; j < 4; ++j) {
-            z[j] = get_z(polygons[i], window_vertices[j]);
+            z[j] = get_z(polygons.data[i], window_vertices[j]);
 
             if (z[j] - z_max[j] > std::numeric_limits<float>::epsilon()) {
                 z_max[j] = z[j];
@@ -202,7 +202,7 @@ std::pair<bool, polygon> find_cover_polygon(const window &window,
             return {false, {}};
     }
 
-    return {true, polygons[polygon_indices[0]]};
+    return {true, polygons.data[polygon_indices[0]]};
 }
 
 void warnock_render(const window &full_window, const uint16_t bg_color,
@@ -216,30 +216,30 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
 
         size_t index = 0;
         size_t disjoint_cursor = 0;
-        size_t surrounding_cursor = current_window.polygons.size();
+        size_t surrounding_cursor = current_window.polygons.size;
         while (index < surrounding_cursor) {
-            polygon polygon = current_window.polygons[index];
+            polygon polygon = current_window.polygons.data[index];
             relationship rel = check_relationship(polygon, current_window);
 
             if (rel == relationship::disjoint) {
-                std::swap(current_window.polygons[index++],
-                          current_window.polygons[disjoint_cursor++]);
+                std::swap(current_window.polygons.data[index++],
+                          current_window.polygons.data[disjoint_cursor++]);
             } else if (rel == relationship::surrounding) {
-                std::swap(current_window.polygons[index],
-                          current_window.polygons[--surrounding_cursor]);
+                std::swap(current_window.polygons.data[index],
+                          current_window.polygons.data[--surrounding_cursor]);
             } else {
                 ++index;
             }
         }
 
-        array<polygon> visible(current_window.polygons.getData() + disjoint_cursor,
-                               current_window.polygons.size() - disjoint_cursor);
+        array<polygon> visible(current_window.polygons.data + disjoint_cursor,
+                               current_window.polygons.size - disjoint_cursor);
 
         uint16_t window_width = current_window.end.x - current_window.begin.x;
         uint16_t window_height = current_window.end.y - current_window.begin.y;
 
         if (window_width == 1 && window_height == 1) {
-            if (visible.size() == 0) {
+            if (visible.size == 0) {
                 set_pixel(current_window.begin, bg_color);
             } else {
                 fill_pixel(current_window.begin, visible, set_pixel);
@@ -247,7 +247,7 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
         } else if (surrounding_cursor != disjoint_cursor) {
             split_window(stack, current_window, visible);
         } else {
-            if (visible.size() == 0) {
+            if (visible.size == 0) {
                 fill_window(current_window, bg_color, set_pixel);
                 continue;
             }
