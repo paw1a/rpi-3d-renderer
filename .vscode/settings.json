@@ -10,5 +10,7 @@
         "**/*.out": true,
         "**/*.run.xml": true,
         "**/*.toc": true,
-    }
+    },
+    "C_Cpp.default.compilerPath": "/opt/homebrew/bin/arm-none-eabi-g++",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

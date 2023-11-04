@@ -232,8 +232,8 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
             }
         }
 
-        array<polygon> visible(current_window.polygons.data + disjoint_cursor,
-                               current_window.polygons.size - disjoint_cursor);
+        array<polygon> visible = {current_window.polygons.data + disjoint_cursor,
+                                  current_window.polygons.size - disjoint_cursor};
 
         uint16_t window_width = current_window.end.x - current_window.begin.x;
         uint16_t window_height = current_window.end.y - current_window.begin.y;

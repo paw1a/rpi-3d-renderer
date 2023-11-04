@@ -2,18 +2,36 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build report",
+      "label": "Build Desktop",
       "type": "shell",
-      "command": "cd docs/tex && latexmk -pdf report.tex",
+      "command": "mkdir -p desktop/build && cd desktop/build && cmake .. && make",
       "group": {
         "kind": "build",
         "isDefault": false
       }
     },
     {
-      "label": "Clean report",
+      "label": "Run Desktop",
       "type": "shell",
-      "command": "cd docs/tex && ./clean.sh",
+      "command": "mkdir -p desktop/build && cd desktop/build && cmake .. && make && cd ../.. && ./desktop/build/desktop",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Build Raspberry Pi Pico",
+      "type": "shell",
+      "command": "./scenegen.py && mkdir -p build && cd build && cmake .. && make",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Clean",
+      "type": "shell",
+      "command": "rm -rf build desktop/build cmake-build-release cmake-build-debug",
       "group": {
         "kind": "build",
         "isDefault": false

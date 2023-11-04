@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "name": "Raspberry Pi Pico",
+      "intelliSenseMode": "gcc-arm",
+      "includePath": [
+          "${workspaceFolder}/src/math",
+          "${workspaceFolder}/src/render",
+          "${workspaceFolder}/src/scene",
+          "${workspaceFolder}/lib/ili9341/gfx",
+          "${workspaceFolder}/lib/ili9341/ili9341"
+      ],
+      "cStandard": "c11",
+      "cppStandard": "c++20"
+    }
+  ],
+  "version": 4
+}
+  
