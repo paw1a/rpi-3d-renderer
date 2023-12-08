@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 pico_sdk_init()
 
 add_subdirectory(lib/fatfs-spi)
-add_subdirectory(lib/ili9341)
+add_subdirectory(lib/st7789)
 
 include_directories(
         src/math
@@ -41,8 +41,7 @@ target_link_libraries(rpi-pico PRIVATE
         pico_stdio
         hardware_gpio
         hardware_spi
-        fatfs_spi
-        ili9341
+        st7789
         gfx
         )
 

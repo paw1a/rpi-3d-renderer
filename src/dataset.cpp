@@ -12,7 +12,7 @@ l -1.0 1.0 1.0
 l 1.0 1.0 1.0
 
 # camera position vector
-cp -10.0 10.0 -60.0
+cp 0 0 -60.0
 # camera target vector (look at)
 ct 0.0 0.0 0.0
 # camera up vector
@@ -2920,7 +2920,7 @@ l -1.0 1.0 1.0
 l 1.0 1.0 1.0
 
 # camera position vector
-cp -10.0 10.0 -10.0
+cp -10.0 5.0 10.0
 # camera target vector (look at)
 ct 0.0 0.0 0.0
 # camera up vector

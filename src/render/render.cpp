@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "render.h"
+#include "st7789.h"
 
 enum class relationship {
     disjoint,
@@ -111,8 +112,8 @@ static relationship check_relationship(const polygon &polygon,
                : relationship::disjoint;
 }
 
-static void fill_pixel(const point2 &point, array<polygon> &polygons,
-                       void set_pixel(point2, uint16_t)) {
+static void fill_pixel(display_t *display, const point2 &point, array<polygon> &polygons,
+                       void set_pixel(display_t *, point2, uint16_t)) {
     uint16_t color = polygons.data[0].color;
     float z_max = get_z(polygons.data[0], point);
     for (int i = 1; i < polygons.size; ++i) {
@@ -123,14 +124,14 @@ static void fill_pixel(const point2 &point, array<polygon> &polygons,
         }
     }
 
-    set_pixel(point, color);
+    set_pixel(display, point, color);
 }
 
-void fill_window(const window &window, const uint16_t color,
-                 void set_pixel(point2, uint16_t)) {
+void fill_window(display_t *display, const window &window, const uint16_t color,
+                 void set_pixel(display_t *, point2, uint16_t)) {
     for (int16_t x = window.begin.x; x < window.end.x; ++x) {
         for (int16_t y = window.begin.y; y < window.end.y; ++y) {
-            set_pixel({x, y}, color);
+            set_pixel(display, {x, y}, color);
         }
     }
 }
@@ -169,6 +170,29 @@ void split_window(std::stack<window> &stack, const window &window,
     }
 }
 
+void initial_split_window(std::stack<window> &stack, const window &window,
+                          const array<polygon> &polygons) {
+    int16_t window_width = window.end.x - window.begin.x;
+    int16_t window_height = window.end.y - window.begin.y;
+
+    int16_t x_split1 = window.begin.x + (window_width / 3);
+    int16_t x_split2 = window.begin.x + (window_width / 3) * 2;
+    int16_t y_split = window.begin.y + (window_height / 2);
+
+    stack.push(
+        {{window.begin.x, window.begin.y}, {x_split1, y_split}, polygons});
+    stack.push(
+        {{x_split1, window.begin.y}, {x_split2, y_split}, polygons});
+    stack.push(
+        {{x_split2, window.begin.y}, {window.end.x, y_split}, polygons});
+    stack.push(
+        {{window.begin.x, y_split}, {x_split1, window.end.y}, polygons});
+    stack.push(
+        {{x_split1, y_split}, {x_split2, window.end.y}, polygons});
+    stack.push(
+        {{x_split2, y_split}, {window.end.x, window.end.y}, polygons});
+}
+
 std::pair<bool, polygon> find_cover_polygon(const window &window,
                                             array<polygon> &polygons) {
     auto window_end_x = static_cast<int16_t>(window.end.x - 1);
@@ -205,10 +229,10 @@ std::pair<bool, polygon> find_cover_polygon(const window &window,
     return {true, polygons.data[polygon_indices[0]]};
 }
 
-void warnock_render(const window &full_window, const uint16_t bg_color,
-                    void set_pixel(point2, uint16_t)) {
+void warnock_render(display_t *display, const window &full_window, const uint16_t bg_color,
+                    void set_pixel(display_t *, point2, uint16_t)) {
     std::stack<window> stack;
-    stack.push(full_window);
+    initial_split_window(stack, full_window, full_window.polygons);
 
     while (!stack.empty()) {
         window current_window = stack.top();
@@ -240,22 +264,22 @@ void warnock_render(const window &full_window, const uint16_t bg_color,
 
         if (window_width == 1 && window_height == 1) {
             if (visible.size == 0) {
-                set_pixel(current_window.begin, bg_color);
+                set_pixel(display, current_window.begin, bg_color);
             } else {
-                fill_pixel(current_window.begin, visible, set_pixel);
+                fill_pixel(display, current_window.begin, visible, set_pixel);
             }
         } else if (surrounding_cursor != disjoint_cursor) {
             split_window(stack, current_window, visible);
         } else {
             if (visible.size == 0) {
-                fill_window(current_window, bg_color, set_pixel);
+                fill_window(display, current_window, bg_color, set_pixel);
                 continue;
             }
 
             std::pair<bool, polygon> result =
                 find_cover_polygon(current_window, visible);
             if (result.first) {
-                fill_window(current_window, result.second.color, set_pixel);
+                fill_window(display, current_window, result.second.color, set_pixel);
             } else {
                 split_window(stack, current_window, visible);
             }

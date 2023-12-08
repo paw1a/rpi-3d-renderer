@@ -4,7 +4,7 @@
 #include "math3d.h"
 #include <vector>
 
-#define SCREEN_WIDTH 320
+#define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 240
 
 using point2 = m3::tvec2<int16_t>;
@@ -33,3 +33,5 @@ struct window {
     point2 end;
     array<polygon> polygons{};
 };
+
+std::vector<std::string> split(const std::string &s, const std::string &delimiter);

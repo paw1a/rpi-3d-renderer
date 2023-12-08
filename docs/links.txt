@@ -6,3 +6,7 @@ https://ogldev.org/www/tutorial12/tutorial12.html
 https://github.com/Noluye/Math3D/
 https://learnopengl.com/Getting-started/Coordinate-Systems
 http://paulbourke.net/dataformats/mtl/
+
+диаграмма процессов
+исправить схему цикла в алгоритме варнока
+
