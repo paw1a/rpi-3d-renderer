@@ -10,6 +10,8 @@ extern "C" {
 
 typedef struct display display_t;
 
+//#define USE_DMA 1
+
 #define ST_CMD_DELAY 0x80 // special signifier for command lists
 
 #define ST77XX_NOP 0x00

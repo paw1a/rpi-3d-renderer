@@ -36,6 +36,7 @@ struct display {
 #define GFX_WHITE 0xFFFF
 
 uint16_t *gfxFramebuffer = NULL;
+uint16_t *buffer = NULL;
 
 static int16_t cursor_y = 0;
 int16_t cursor_x = 0;
@@ -125,9 +126,21 @@ void GFX_fillRect(display_t *display, int16_t x, int16_t y, int16_t w, int16_t h
 
 void GFX_createFramebuf(display_t *display) {
     gfxFramebuffer = malloc(display->width * display->height * sizeof(uint16_t));
+    buffer = malloc(120 * 80 * 2);
 }
 
 void GFX_flush(display_t *display) {
     if (gfxFramebuffer != NULL)
         LCD_WriteBitmap(display, 0, 0, display->width, display->height, gfxFramebuffer);
+}
+
+void GFX_flush_block(display_t *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+    size_t counter = 0;
+    for (uint16_t j = y; j < y + height; j++) {
+        for (uint16_t i = x; i < x + width; i++) {
+            buffer[counter++] = gfxFramebuffer[i + j * display->width];
+        }
+    }
+    if (gfxFramebuffer != NULL)
+        LCD_WriteBitmap(display, x, y, width, height, buffer);
 }

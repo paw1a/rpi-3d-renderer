@@ -1,5 +1,6 @@
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
+#include "hardware/dma.h"
 
 #include "st7789.h"
 
@@ -17,7 +18,16 @@ struct display {
     int16_t pinRST;
     uint16_t pinSCK;
     uint16_t pinTX;
+
+    uint dma_tx;
+    dma_channel_config dma_cfg;
 };
+
+#ifdef USE_DMA
+void waitForDMA(display_t *display) {
+    dma_channel_wait_for_finish_blocking(display->dma_tx);
+}
+#endif
 
 static const uint8_t generic_st7789[] = { // Init commands for 7789 screens
     9,									  //  9 commands in list:
@@ -63,6 +73,13 @@ void initSPI(display_t *display) {
         gpio_set_dir(display->pinRST, GPIO_OUT);
         gpio_put(display->pinRST, 1);
     }
+
+#ifdef USE_DMA
+    display->dma_tx = dma_claim_unused_channel(true);
+    display->dma_cfg = dma_channel_get_default_config(display->dma_tx);
+    channel_config_set_transfer_data_size(&display->dma_cfg, DMA_SIZE_16);
+    channel_config_set_dreq(&display->dma_cfg, spi_get_dreq(display->spi, true));
+#endif
 }
 
 void ST7789_Reset(display_t *display) {
@@ -191,7 +208,17 @@ void LCD_WriteBitmap(display_t *display, uint16_t x, uint16_t y,
     LCD_setAddrWindow(display, x, y, w, h); // Clipped area
     ST7789_RegData(display);
     spi_set_format(display->spi, 16, SPI_CPOL_1, SPI_CPOL_1, SPI_MSB_FIRST);
+
+#ifdef USE_DMA
+    dma_channel_configure(display->dma_tx, &display->dma_cfg,
+                          &spi_get_hw(display->spi)->dr, // write address
+                          bitmap,
+                          w * h,
+                          true);
+    waitForDMA(display);
+#else
     spi_write16_blocking(display->spi, bitmap, w * h);
+#endif
 }
 
 void LCD_WritePixel(display_t *display, int x, int y, uint16_t col) {

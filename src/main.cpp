@@ -3,6 +3,7 @@
 
 #include "gfx.h"
 #include "hardware/spi.h"
+#include "hardware/dma.h"
 #include "st7789.h"
 #include "pico/stdlib.h"
 
@@ -13,6 +14,7 @@
 #include "dataset.h"
 
 #define COMMAND_MAX_SIZE 255
+#define DISPLAY_COUNT 2
 
 struct display {
     uint16_t width;
@@ -28,6 +30,9 @@ struct display {
     int16_t pinRST;
     uint16_t pinSCK;
     uint16_t pinTX;
+
+    uint dma_tx;
+    dma_channel_config dma_cfg;
 };
 
 std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
@@ -60,7 +65,7 @@ static struct state {
     m3::mat4 scale;
     char command[COMMAND_MAX_SIZE]{};
     size_t commandSize{};
-    array<polygon> polygons{};
+    array<polygon> polygons[2];
 } state;
 
 static display_t displays[2];
@@ -118,8 +123,10 @@ static void execute_command() {
                 for (auto &object : state.scene.objects)
                     polygons_size += object.faces.size();
 
-                delete [] state.polygons.data;
-                state.polygons = {new polygon[polygons_size], polygons_size};
+                for (size_t i = 0; i < DISPLAY_COUNT; i++) {
+                    delete[] state.polygons[i].data;
+                    state.polygons[i] = {new polygon[polygons_size], polygons_size};
+                }
                 std::cout << "polygons count = " << polygons_size << std::endl;
                 std::cout << std::endl;
                 return;
@@ -273,7 +280,9 @@ int main() {
     for (auto &object : state.scene.objects)
         polygons_size += object.faces.size();
 
-    state.polygons = {new polygon[polygons_size], polygons_size};
+    for (size_t i = 0; i < DISPLAY_COUNT; i++) {
+        state.polygons[i] = {new polygon[polygons_size], polygons_size};
+    }
     std::cout << "polygons count = " << polygons_size << std::endl;
 
     state.rotate[0] = m3::rotate_x(0) * m3::rotate_y(0) * m3::rotate_z(0);
@@ -285,9 +294,11 @@ int main() {
             GFX_clearScreen(&displays[i]);
 
             m3::mat4 view = m3::look_at(
-                m3::transform_vector(state.rotate[i], state.scene.camera.position),
+                m3::transform_vector(state.rotate[i],
+                                     state.scene.camera.position),
                 state.scene.camera.target,
-                m3::transform_vector(state.rotate[i], state.scene.camera.up));
+                m3::transform_vector(state.rotate[i],
+                                     state.scene.camera.up));
             m3::mat4 perspective = m3::perspective(80, 1, 1.1f, 10.0f);
             m3::mat4 transform = state.scale * perspective * view;
 
@@ -297,7 +308,7 @@ int main() {
                 }
             }
 
-            if (!scene_to_polygons(state.scene, state.polygons)) {
+            if (!scene_to_polygons(state.scene, state.polygons[i])) {
                 std::cout << "failed to preprocess objects" << std::endl;
                 idle();
             }
@@ -308,15 +319,41 @@ int main() {
                     vertex = m3::transform_vector(transform, vertex);
                 }
             }
+        }
 
-            warnock_render(&displays[i], {{-displays[i].width / 2,
-                                           -displays[i].height / 2},
-                                          {displays[i].width / 2,
-                                           displays[i].height / 2},
-                            state.polygons},
-                           BLACK, set_pixel);
+        window window = {{-displays[0].width / 2, -displays[0].height / 2},
+                          {displays[0].width / 2, displays[0].height / 2}};
+        int16_t window_width = window.end.x - window.begin.x;
+        int16_t window_height = window.end.y - window.begin.y;
 
-            GFX_flush(&displays[i]);
+        int16_t x_split1 = window.begin.x + (window_width / 3);
+        int16_t x_split2 = window.begin.x + (window_width / 3) * 2;
+        int16_t y_split = window.begin.y + (window_height / 2);
+
+        struct window windows[DISPLAY_COUNT][6] = {{
+                {{window.begin.x, window.begin.y}, {x_split1, y_split}, state.polygons[0]},
+                {{x_split1, window.begin.y}, {x_split2, y_split}, state.polygons[0]},
+                {{x_split2, window.begin.y}, {window.end.x, y_split}, state.polygons[0]},
+                {{window.begin.x, y_split}, {x_split1, window.end.y}, state.polygons[0]},
+                {{x_split1, y_split}, {x_split2, window.end.y}, state.polygons[0]},
+                {{x_split2, y_split}, {window.end.x, window.end.y}, state.polygons[0]}
+            }, {
+                {{x_split1, window.begin.y}, {x_split2, y_split}, state.polygons[1]},
+                {{x_split2, window.begin.y}, {window.end.x, y_split}, state.polygons[1]},
+                {{window.begin.x, y_split}, {x_split1, window.end.y}, state.polygons[1]},
+                {{x_split1, y_split}, {x_split2, window.end.y}, state.polygons[1]},
+                {{x_split2, y_split}, {window.end.x, window.end.y}, state.polygons[1]},
+                {{window.begin.x, window.begin.y}, {x_split1, y_split}, state.polygons[1]}
+            }
+        };
+
+        for (size_t i = 0; i < 6; i++) {
+            for (size_t j = 0; j < 2; j++) {
+                window = windows[j][i];
+                warnock_render(&displays[j], window, BLACK, set_pixel);
+                GFX_flush_block(&displays[j], window.begin.x + displays[j].width / 2,
+                                window.begin.y + displays[j].height / 2, 80, 120);
+            }
         }
     }
 }
