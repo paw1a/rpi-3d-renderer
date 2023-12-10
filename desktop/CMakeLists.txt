@@ -10,7 +10,8 @@ find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS}
         ${RENDERER_SOURCES_PATH}/src/math
         ${RENDERER_SOURCES_PATH}/src/render
-        ${RENDERER_SOURCES_PATH}/src/scene)
+        ${RENDERER_SOURCES_PATH}/src/scene
+        ${RENDERER_SOURCES_PATH}/src)
 
 add_executable(desktop
         main.cpp

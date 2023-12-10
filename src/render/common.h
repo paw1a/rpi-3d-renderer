@@ -4,9 +4,6 @@
 #include "math3d.h"
 #include <vector>
 
-#define SCREEN_WIDTH 240
-#define SCREEN_HEIGHT 240
-
 using point2 = m3::tvec2<int16_t>;
 
 struct line2 {

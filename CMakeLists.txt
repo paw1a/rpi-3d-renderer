@@ -11,13 +11,13 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 pico_sdk_init()
 
-add_subdirectory(lib/fatfs-spi)
 add_subdirectory(lib/st7789)
 
 include_directories(
         src/math
         src/render
         src/scene
+        src
 )
 
 add_executable(rpi-pico
@@ -45,4 +45,4 @@ target_link_libraries(rpi-pico PRIVATE
         gfx
         )
 
-#add_subdirectory(desktop)
+add_subdirectory(desktop)

@@ -3,6 +3,22 @@
 
 #include "st7789.h"
 
+struct display {
+    uint16_t width;
+    uint16_t height;
+
+    int16_t xstart;
+    int16_t ystart;
+
+    uint8_t rotation;
+
+    spi_inst_t *spi;
+    uint16_t pinDC;
+    int16_t pinRST;
+    uint16_t pinSCK;
+    uint16_t pinTX;
+};
+
 static const uint8_t generic_st7789[] = { // Init commands for 7789 screens
     9,									  //  9 commands in list:
     ST77XX_SWRESET, ST_CMD_DELAY,		  //  1: Software reset, no args, w/delay

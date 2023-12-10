@@ -4,7 +4,6 @@
 
 #include "common.h"
 #include "render.h"
-#include "st7789.h"
 
 enum class relationship {
     disjoint,
@@ -170,7 +169,7 @@ void split_window(std::stack<window> &stack, const window &window,
     }
 }
 
-void initial_split_window(std::stack<window> &stack, const window &window,
+void split_window_modified(std::stack<window> &stack, const window &window,
                           const array<polygon> &polygons) {
     int16_t window_width = window.end.x - window.begin.x;
     int16_t window_height = window.end.y - window.begin.y;
@@ -232,7 +231,7 @@ std::pair<bool, polygon> find_cover_polygon(const window &window,
 void warnock_render(display_t *display, const window &full_window, const uint16_t bg_color,
                     void set_pixel(display_t *, point2, uint16_t)) {
     std::stack<window> stack;
-    initial_split_window(stack, full_window, full_window.polygons);
+    stack.push(full_window);
 
     while (!stack.empty()) {
         window current_window = stack.top();

@@ -8,6 +8,8 @@ extern "C" {
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 
+typedef struct display display_t;
+
 #define ST_CMD_DELAY 0x80 // special signifier for command lists
 
 #define ST77XX_NOP 0x00
@@ -56,22 +58,6 @@ extern "C" {
 #define ST77XX_MAGENTA 0xF81F
 #define ST77XX_YELLOW 0xFFE0
 #define ST77XX_ORANGE 0xFC00
-
-typedef struct display {
-    uint16_t width;
-    uint16_t height;
-
-    int16_t xstart;
-    int16_t ystart;
-
-    uint8_t rotation;
-
-    spi_inst_t *spi;
-    uint16_t pinDC;
-    int16_t pinRST;
-    uint16_t pinSCK;
-    uint16_t pinTX;
-} display_t;
 
 void LCD_initDisplay(display_t *display, uint16_t width, uint16_t height);
 void LCD_setRotation(display_t *display, uint8_t m);

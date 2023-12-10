@@ -14,6 +14,22 @@
 
 #define COMMAND_MAX_SIZE 255
 
+struct display {
+    uint16_t width;
+    uint16_t height;
+
+    int16_t xstart;
+    int16_t ystart;
+
+    uint8_t rotation;
+
+    spi_inst_t *spi;
+    uint16_t pinDC;
+    int16_t pinRST;
+    uint16_t pinSCK;
+    uint16_t pinTX;
+};
+
 std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
     size_t pos_start = 0;
     size_t pos_end;
@@ -33,7 +49,7 @@ std::vector<std::string> split(const std::string &s, const std::string &delimite
 }
 
 static void set_pixel(display_t *display, point2 point, uint16_t color) {
-    GFX_drawPixel(display, point.x + SCREEN_WIDTH / 2, point.y + SCREEN_HEIGHT / 2,
+    GFX_drawPixel(display, point.x + display->width / 2, point.y + display->height / 2,
                   color);
 }
 
@@ -293,8 +309,10 @@ int main() {
                 }
             }
 
-            warnock_render(&displays[i], {{-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2},
-                            {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2},
+            warnock_render(&displays[i], {{-displays[i].width / 2,
+                                           -displays[i].height / 2},
+                                          {displays[i].width / 2,
+                                           displays[i].height / 2},
                             state.polygons},
                            BLACK, set_pixel);
 

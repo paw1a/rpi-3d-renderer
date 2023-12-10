@@ -9,6 +9,12 @@
 #include "math3d.h"
 #include "pipeline.h"
 #include "render.h"
+#include "display.h"
+
+struct display {
+    int16_t width;
+    int16_t height;
+};
 
 static uint32_t sdl_color_to_uint32(SDL_Color color) {
     uint32_t num = color.r;
@@ -21,14 +27,16 @@ static uint32_t sdl_color_to_uint32(SDL_Color color) {
 
 static uint32_t *pixels;
 
-static void set_pixel(point2 point, uint16_t rgb565_color) {
+static void set_pixel(display_t *display, point2 point, uint16_t rgb565_color) {
     color rgb_color = rgb565_to_rgb(rgb565_color);
     SDL_Color sdl_color = {rgb_color.r, rgb_color.g, rgb_color.b, 255};
-    pixels[(point.y + SCREEN_HEIGHT / 2) * SCREEN_WIDTH +
-           (point.x + SCREEN_WIDTH / 2)] = sdl_color_to_uint32(sdl_color);
+    pixels[(point.y + display->height / 2) * display->width +
+           (point.x + display->width / 2)] = sdl_color_to_uint32(sdl_color);
 }
 
 int main() {
+    display_t display = {1080, 720};
+
     scene scene;
     std::string scene_path = "models/monkey.scene";
     std::ifstream ifs(scene_path, std::ios::in);
@@ -53,7 +61,7 @@ int main() {
 
     SDL_Window *window = SDL_CreateWindow(
         "Test Renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        display.width, display.height, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
         printf("failed to create window: %s\n", SDL_GetError());
         return -1;
@@ -68,13 +76,13 @@ int main() {
 
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888,
                                              SDL_TEXTUREACCESS_STREAMING,
-                                             SCREEN_WIDTH, SCREEN_HEIGHT);
+                                             display.width, display.height);
     if (texture == nullptr) {
         printf("failed to create texture: %s\n", SDL_GetError());
         return -1;
     }
 
-    pixels = new uint32_t[SCREEN_HEIGHT * SCREEN_WIDTH];
+    pixels = new uint32_t[display.height * display.width];
 
     size_t polygons_size = 0;
     for (auto &object : scene.objects)
@@ -89,7 +97,7 @@ int main() {
     while (!quit) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
-        memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * 4);
+        memset(pixels, 0, display.width * display.height * 4);
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -146,8 +154,10 @@ int main() {
         //                  << std::endl;
 
         begin = std::chrono::steady_clock::now();
-        warnock_render({{-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2},
-                        {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2},
+        warnock_render(&display, {{static_cast<short>(-display.width / 2),
+                                   static_cast<short>(-display.height / 2)},
+                                  {static_cast<short>(display.width / 2),
+                                   static_cast<short>(display.height / 2)},
                         polygons},
                        BLACK, set_pixel);
 
@@ -159,7 +169,7 @@ int main() {
         //                         .count()
         //                  << std::endl;
 
-        SDL_UpdateTexture(texture, nullptr, pixels, SCREEN_WIDTH * 4);
+        SDL_UpdateTexture(texture, nullptr, pixels, display.width * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
         SDL_RenderPresent(renderer);
     }
