@@ -72,20 +72,20 @@ static display_t displays[2];
 
 static void print_usage() {
     std::cout << "\nRaspberry Pi Pico 3D" << std::endl;
-    std::cout << "Usage:\n" << std::endl;
-    std::cout << "help\tPrint help information" << std::endl;
-    std::cout << "models\tPrint list of available 3D models" << std::endl;
-    std::cout << "load\t<model name> -- Loads model by its name" << std::endl;
+    std::cout << "Инструкция:\n" << std::endl;
+    std::cout << "help\tВывод информации о командах" << std::endl;
+    std::cout << "models\tВывод списка названий доступных трехмерных сцен" << std::endl;
+    std::cout << "load <название сцены> -- Загрузка сцены по ее названию" << std::endl;
     std::cout << "camera set cp <x, y, z> ct <x, y, z> cu <x, y, z>"
-                 " -- Set camera position with position, target, up vectors"
+                 " -- Установка камеры по трем векторам направлений"
               << std::endl;
     std::cout << "camera rotate <rx, ry, rz>"
-                 " -- Rotate camera, where rx, ry, rz - angles in degrees"
+                 " -- Вращение камеры, где rx, ry, rz - углы поворота по осям в градусах"
               << std::endl;
     std::cout << "camera scale <k>"
-                 " -- Scale camera, where k - scale factor"
+                 " -- Масштабирование камеры, где k - коэффициент масштабирования"
               << std::endl;
-    std::cout << "camera reset -- Reset camera position to default\n" << std::endl;
+    std::cout << "camera reset -- Сброс настроек камеры к значению по умолчанию\n" << std::endl;
 }
 
 static void execute_command() {
@@ -97,13 +97,13 @@ static void execute_command() {
 
     std::string operation = tokens[0];
     if (operation == "models") {
-        std::cout << "list of available 3d models" << std::endl;
+        std::cout << "Список названий доступных трехмерных сцен" << std::endl;
         for (size_t i = 0; i < DATASETS_SIZE; i++) {
             std::cout << datasets[i].name << std::endl;
         }
     } else if (operation == "load") {
         if (tokens.size() != 2) {
-            std::cout << "usage: load <model name>" << std::endl;
+            std::cout << "Неверное число аргументов" << std::endl;
             return;
         }
 
@@ -115,7 +115,7 @@ static void execute_command() {
                 state.scene.materials.clear();
                 state.scene.lights.clear();
                 if (!load_scene(state.dataset, state.scene)) {
-                    std::cout << "failed to load scene file " << state.dataset.name << std::endl;
+                    std::cout << "Ошибка при загрузке сцены " << state.dataset.name << std::endl;
                     return;
                 }
 
@@ -127,12 +127,12 @@ static void execute_command() {
                     delete[] state.polygons[i].data;
                     state.polygons[i] = {new polygon[polygons_size], polygons_size};
                 }
-                std::cout << "polygons count = " << polygons_size << std::endl;
+                std::cout << "Количество полигонов на сцене = " << polygons_size << std::endl;
                 std::cout << std::endl;
                 return;
             }
         }
-        std::cout << "invalid model name, check models list" << std::endl;
+        std::cout << "Неправильное название сцены, проверьте список" << std::endl;
     } else if (operation == "camera") {
         if (tokens.size() < 2) {
             std::cout << "invalid command arguments" << std::endl;
@@ -142,7 +142,7 @@ static void execute_command() {
         std::string key = tokens[1];
         if (key == "set") {
             if (tokens.size() != 11) {
-                std::cout << "invalid camera set arguments" << std::endl;
+                std::cout << "Неверное число аргументов" << std::endl;
                 return;
             }
 
@@ -167,7 +167,7 @@ static void execute_command() {
             state.scale = m3::scale({2000, 2000, 2000});
         } else if (key == "rotate") {
             if (tokens.size() != 5) {
-                std::cout << "invalid camera rotate arguments" << std::endl;
+                std::cout << "Неверное число аргументов" << std::endl;
                 return;
             }
 
@@ -180,7 +180,7 @@ static void execute_command() {
             }
         } else if (key == "scale") {
             if (tokens.size() != 3) {
-                std::cout << "invalid camera scale arguments" << std::endl;
+                std::cout << "Неверное число аргументов" << std::endl;
                 return;
             }
 
@@ -192,13 +192,13 @@ static void execute_command() {
             state.rotate[1] = m3::rotate_x(0) * m3::rotate_y(90 * 3.14f / 180) * m3::rotate_z(0);
             state.scale = m3::scale({2000, 2000, 2000});
         } else {
-            std::cout << "invalid camera option" << std::endl;
+            std::cout << "Неверное число аргументов" << std::endl;
             return;
         }
     } else if (command == "help") {
         print_usage();
     } else {
-        std::cout << "invalid command" << std::endl;
+        std::cout << "Неизвестная команда" << std::endl;
     }
     std::cout << std::endl;
 }
@@ -264,11 +264,7 @@ int main() {
     LCD_initDisplay(&displays[1], 240, 240);
     LCD_setRotation(&displays[1], 2);
 
-    std::cout << "displayes inited" << std::endl;
-
     GFX_createFramebuf(&displays[0]);
-
-    std::cout << "buffer inited" << std::endl;
 
     state.dataset = datasets[0];
     if (!load_scene(state.dataset, state.scene)) {
@@ -283,7 +279,7 @@ int main() {
     for (size_t i = 0; i < DISPLAY_COUNT; i++) {
         state.polygons[i] = {new polygon[polygons_size], polygons_size};
     }
-    std::cout << "polygons count = " << polygons_size << std::endl;
+    std::cout << "Количество полигонов на сцене = " << polygons_size << std::endl;
 
     state.rotate[0] = m3::rotate_x(0) * m3::rotate_y(0) * m3::rotate_z(0);
     state.rotate[1] = m3::rotate_x(0) * m3::rotate_y(90 * 3.14f / 180) * m3::rotate_z(0);

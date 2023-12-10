@@ -38,7 +38,7 @@ int main() {
     display_t display = {1080, 720};
 
     scene scene;
-    std::string scene_path = "models/monkey.scene";
+    std::string scene_path = "models/tree.scene";
     std::ifstream ifs(scene_path, std::ios::in);
     if (!ifs.is_open()) {
         std::cout << "failed to open scene file " << scene_path << std::endl;

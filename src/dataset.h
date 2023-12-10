@@ -6,5 +6,5 @@ struct dataset {
     const char *obj;
     const char *mtl;
 };
-#define DATASETS_SIZE 5
+#define DATASETS_SIZE 6
 extern const dataset datasets[];

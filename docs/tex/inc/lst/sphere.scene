@@ -1,0 +1,17 @@
+# path to .obj file
+o models/sphere.obj
+
+# path to .mtl file
+m models/sphere.mtl
+
+# light positions
+l -1.0 -1.0 -1.0
+l -1.0 1.0 1.0
+l 1.0 1.0 1.0
+
+# camera position vector
+cp -10.0 10.0 -15.0
+# camera target vector (look at)
+ct 0.0 0.0 0.0
+# camera up vector
+cu 0.0 1.0 0.0

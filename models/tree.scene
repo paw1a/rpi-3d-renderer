@@ -1,0 +1,18 @@
+# path to .obj file
+o models/tree.obj
+
+# path to .mtl file
+m models/tree.mtl
+
+# light positions
+l -1.0 -1.0 -1.0
+l -1.0 1.0 1.0
+l 1.0 1.0 1.0
+l 1.0 -1.0 1.0
+
+# camera position vector
+cp 0 0 -10
+# camera target vector (look at)
+ct 0.0 0.0 0.0
+# camera up vector
+cu 0.0 1.0 0.0
