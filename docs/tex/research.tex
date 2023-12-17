@@ -9,7 +9,7 @@
 
 Характеристики микроконтроллера RP2040:
 \begin{itemize}
-    \item 32-битный процессор ARM Cortex-M0+\~cite{cortex-m0};
+    \item 32-битный процессор ARM Cortex-M0+~\cite{cortex-m0};
     \item тактовая частота процессора -- 133 МГц;
     \item объем оперативной памяти -- 264 Кб;
     \item объем постоянной памяти -- 2 Мб;
@@ -25,12 +25,12 @@
 \begin{table}[H]
     \caption{\label{tbl:time}Замеры времени сравнения алгоритмов Варнока}
 	\resizebox{\textwidth}{!}{
-	\def\arraystretch{1.5}
+	\def\arraystretch{1}
     \begin{tabular}{|c|c|c|}
     \hline
     Кол-во полигонов, шт &
-      \begin{tabular}[c]{@{}c@{}}Модифицированный \\ алгоритм Варнока\end{tabular} &
-      \begin{tabular}[c]{@{}c@{}}Классический \\ алгоритм Варнока\end{tabular} \\ \hline
+      \begin{tabular}[c]{@{}c@{}}Модифицированный \\ алгоритм Варнока, мс\end{tabular} &
+      \begin{tabular}[c]{@{}c@{}}Классический \\ алгоритм Варнока, мс\end{tabular} \\ \hline
     50  & 1452  & 2032  \\ \hline
     100 & 3132  & 4698  \\ \hline
     150 & 5076  & 7360  \\ \hline
