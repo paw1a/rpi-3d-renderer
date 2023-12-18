@@ -12,5 +12,12 @@ set xlabel "Кол-во полигонов, шт."
 set ylabel "Время, мс"
 set grid
 
-plot "./data.txt" using 1:2 with linespoints title 'Модифицированный алгоритм Варнока' pt 9,\
-     "./data.txt" using 1:3 with linespoints title 'Классический алгоритм Варнока' pt 10
+f(x) = a*x + b
+fit f(x) 'data1.txt' via a,b
+g(x) = c*x + d
+fit g(x) 'data2.txt' via c,d
+
+plot f(x) title 'Модифицированный алгоритм Варнока' lt rgb 'navy',\
+    "./data1.txt" pt 9 lt rgb 'navy' title '',\
+     g(x) title 'Классический алгоритм Варнока' lt rgb 'forest-green',\
+     "./data2.txt" pt 12 lt rgb 'forest-green' title ''
