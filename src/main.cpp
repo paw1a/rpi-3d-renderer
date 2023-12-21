@@ -6,6 +6,7 @@
 #include "hardware/dma.h"
 #include "st7789.h"
 #include "pico/stdlib.h"
+#include "pico/time.h"
 
 #include "debug.h"
 #include "loader.h"
@@ -343,13 +344,21 @@ int main() {
             }
         };
 
-        for (size_t i = 0; i < 6; i++) {
-            for (size_t j = 0; j < 2; j++) {
-                window = windows[j][i];
-                warnock_render(&displays[j], window, BLACK, set_pixel);
-                GFX_flush_block(&displays[j], window.begin.x + displays[j].width / 2,
-                                window.begin.y + displays[j].height / 2, 80, 120);
+//        for (size_t k = 50; k <= 500; k += 50) {
+//            uint32_t start = to_ms_since_boot(get_absolute_time());
+            for (size_t i = 0; i < 6; i++) {
+                for (size_t j = 0; j < 2; j++) {
+                    window = windows[j][i];
+//                    window.polygons.data = state.polygons[j].data;
+//                    window.polygons.size = k;
+                    warnock_render(&displays[j], window, BLACK, set_pixel);
+                    GFX_flush_block(&displays[j], window.begin.x + displays[j].width / 2,
+                                    window.begin.y + displays[j].height / 2, 80, 120);
+                }
             }
-        }
+//            uint32_t end = to_ms_since_boot(get_absolute_time());
+//            std::cout << k << " " << end - start << std::endl;
+//        }
+//        return 1;
     }
 }

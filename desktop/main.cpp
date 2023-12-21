@@ -38,7 +38,7 @@ int main() {
     display_t display = {1080, 720};
 
     scene scene;
-    std::string scene_path = "models/tree.scene";
+    std::string scene_path = "models/sphere.scene";
     std::ifstream ifs(scene_path, std::ios::in);
     if (!ifs.is_open()) {
         std::cout << "failed to open scene file " << scene_path << std::endl;
@@ -146,28 +146,14 @@ int main() {
         }
 
         auto end = std::chrono::steady_clock::now();
-        //        std::cout << "preprocess time = "
-        //                  <<
-        //                  std::chrono::duration_cast<std::chrono::microseconds>(
-        //                         end - begin)
-        //                         .count()
-        //                  << std::endl;
 
-        begin = std::chrono::steady_clock::now();
-        warnock_render(&display, {{static_cast<short>(-display.width / 2),
-                                   static_cast<short>(-display.height / 2)},
-                                  {static_cast<short>(display.width / 2),
-                                   static_cast<short>(display.height / 2)},
+        warnock_render(&display,
+                       {{static_cast<short>(-display.width / 2),
+                         static_cast<short>(-display.height / 2)},
+                        {static_cast<short>(display.width / 2),
+                         static_cast<short>(display.height / 2)},
                         polygons},
-                       BLACK, set_pixel);
-
-        end = std::chrono::steady_clock::now();
-        //        std::cout << "render time = "
-        //                  <<
-        //                  std::chrono::duration_cast<std::chrono::microseconds>(
-        //                         end - begin)
-        //                         .count()
-        //                  << std::endl;
+                       WHITE, set_pixel);
 
         SDL_UpdateTexture(texture, nullptr, pixels, display.width * 4);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
